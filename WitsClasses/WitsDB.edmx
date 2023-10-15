@@ -1,0 +1,519 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="WitsAndWagersModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="BlockedPlayers">
+          <Key>
+            <PropertyRef Name="blockId" />
+          </Key>
+          <Property Name="blockId" Type="int" Nullable="false" />
+          <Property Name="player" Type="nvarchar" MaxLength="50" />
+          <Property Name="blockedPlayer" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Celebrations">
+          <Key>
+            <PropertyRef Name="celebrationId" />
+          </Key>
+          <Property Name="celebrationId" Type="int" Nullable="false" />
+          <Property Name="celebrationRoute" Type="nvarchar" MaxLength="1000" />
+        </EntityType>
+        <EntityType Name="Friends">
+          <Key>
+            <PropertyRef Name="friendshipId" />
+          </Key>
+          <Property Name="friendshipId" Type="int" Nullable="false" />
+          <Property Name="principalPlayer" Type="nvarchar" MaxLength="50" />
+          <Property Name="friend" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Notifications">
+          <Key>
+            <PropertyRef Name="notificationId" />
+          </Key>
+          <Property Name="notificationId" Type="int" Nullable="false" />
+          <Property Name="senderPlayer" Type="nvarchar" MaxLength="50" />
+          <Property Name="receiverPlayer" Type="nvarchar" MaxLength="50" />
+          <Property Name="notificationState" Type="int" />
+        </EntityType>
+        <EntityType Name="Players">
+          <Key>
+            <PropertyRef Name="username" />
+          </Key>
+          <Property Name="username" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="email" Type="nvarchar" MaxLength="150" />
+          <Property Name="userPassword" Type="nvarchar" MaxLength="200" />
+          <Property Name="highestScore" Type="int" />
+          <Property Name="profilePictureId" Type="int" />
+          <Property Name="celebrationId" Type="int" />
+        </EntityType>
+        <EntityType Name="ProfilePictures">
+          <Key>
+            <PropertyRef Name="profilePictureId" />
+          </Key>
+          <Property Name="profilePictureId" Type="int" Nullable="false" />
+          <Property Name="profilePictureRoute" Type="nvarchar" MaxLength="1000" />
+        </EntityType>
+        <EntityType Name="Questions">
+          <Key>
+            <PropertyRef Name="questionId" />
+          </Key>
+          <Property Name="questionId" Type="int" Nullable="false" />
+          <Property Name="questionES" Type="nvarchar" MaxLength="500" />
+          <Property Name="questionEN" Type="nvarchar" MaxLength="500" />
+          <Property Name="answerES" Type="nvarchar" MaxLength="500" />
+          <Property Name="answerEN" Type="nvarchar" MaxLength="500" />
+        </EntityType>
+        <Association Name="FK_blockedPlayer">
+          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
+          <End Role="BlockedPlayers" Type="Self.BlockedPlayers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="username" />
+            </Principal>
+            <Dependent Role="BlockedPlayers">
+              <PropertyRef Name="player" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_celebrationId">
+          <End Role="Celebrations" Type="Self.Celebrations" Multiplicity="0..1" />
+          <End Role="Players" Type="Self.Players" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Celebrations">
+              <PropertyRef Name="celebrationId" />
+            </Principal>
+            <Dependent Role="Players">
+              <PropertyRef Name="celebrationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_friend">
+          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
+          <End Role="Friends" Type="Self.Friends" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="username" />
+            </Principal>
+            <Dependent Role="Friends">
+              <PropertyRef Name="friend" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_player">
+          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
+          <End Role="BlockedPlayers" Type="Self.BlockedPlayers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="username" />
+            </Principal>
+            <Dependent Role="BlockedPlayers">
+              <PropertyRef Name="player" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_principalPlayer">
+          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
+          <End Role="Friends" Type="Self.Friends" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="username" />
+            </Principal>
+            <Dependent Role="Friends">
+              <PropertyRef Name="principalPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_profilePictureId">
+          <End Role="ProfilePictures" Type="Self.ProfilePictures" Multiplicity="0..1" />
+          <End Role="Players" Type="Self.Players" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProfilePictures">
+              <PropertyRef Name="profilePictureId" />
+            </Principal>
+            <Dependent Role="Players">
+              <PropertyRef Name="profilePictureId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_receiverPlayer">
+          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
+          <End Role="Notifications" Type="Self.Notifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="username" />
+            </Principal>
+            <Dependent Role="Notifications">
+              <PropertyRef Name="receiverPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_senderPlayer">
+          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
+          <End Role="Notifications" Type="Self.Notifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="username" />
+            </Principal>
+            <Dependent Role="Notifications">
+              <PropertyRef Name="senderPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="WitsAndWagersModelStoreContainer">
+          <EntitySet Name="BlockedPlayers" EntityType="Self.BlockedPlayers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Celebrations" EntityType="Self.Celebrations" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Friends" EntityType="Self.Friends" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Notifications" EntityType="Self.Notifications" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Players" EntityType="Self.Players" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ProfilePictures" EntityType="Self.ProfilePictures" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Questions" EntityType="Self.Questions" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_blockedPlayer" Association="Self.FK_blockedPlayer">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="BlockedPlayers" EntitySet="BlockedPlayers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_celebrationId" Association="Self.FK_celebrationId">
+            <End Role="Celebrations" EntitySet="Celebrations" />
+            <End Role="Players" EntitySet="Players" />
+          </AssociationSet>
+          <AssociationSet Name="FK_friend" Association="Self.FK_friend">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="Friends" EntitySet="Friends" />
+          </AssociationSet>
+          <AssociationSet Name="FK_player" Association="Self.FK_player">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="BlockedPlayers" EntitySet="BlockedPlayers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_principalPlayer" Association="Self.FK_principalPlayer">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="Friends" EntitySet="Friends" />
+          </AssociationSet>
+          <AssociationSet Name="FK_profilePictureId" Association="Self.FK_profilePictureId">
+            <End Role="ProfilePictures" EntitySet="ProfilePictures" />
+            <End Role="Players" EntitySet="Players" />
+          </AssociationSet>
+          <AssociationSet Name="FK_receiverPlayer" Association="Self.FK_receiverPlayer">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="Notifications" EntitySet="Notifications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_senderPlayer" Association="Self.FK_senderPlayer">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="Notifications" EntitySet="Notifications" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="WitsAndWagersModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="BlockedPlayers">
+          <Key>
+            <PropertyRef Name="blockId" />
+          </Key>
+          <Property Name="blockId" Type="Int32" Nullable="false" />
+          <Property Name="player" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="blockedPlayer" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Players" Relationship="Self.FK_blockedPlayer" FromRole="BlockedPlayers" ToRole="Players" />
+          <NavigationProperty Name="Players1" Relationship="Self.FK_player" FromRole="BlockedPlayers" ToRole="Players" />
+        </EntityType>
+        <EntityType Name="Celebrations">
+          <Key>
+            <PropertyRef Name="celebrationId" />
+          </Key>
+          <Property Name="celebrationId" Type="Int32" Nullable="false" />
+          <Property Name="celebrationRoute" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Players" Relationship="Self.FK_celebrationId" FromRole="Celebrations" ToRole="Players" />
+        </EntityType>
+        <EntityType Name="Friends">
+          <Key>
+            <PropertyRef Name="friendshipId" />
+          </Key>
+          <Property Name="friendshipId" Type="Int32" Nullable="false" />
+          <Property Name="principalPlayer" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="friend" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Players" Relationship="Self.FK_friend" FromRole="Friends" ToRole="Players" />
+          <NavigationProperty Name="Players1" Relationship="Self.FK_principalPlayer" FromRole="Friends" ToRole="Players" />
+        </EntityType>
+        <EntityType Name="Notifications">
+          <Key>
+            <PropertyRef Name="notificationId" />
+          </Key>
+          <Property Name="notificationId" Type="Int32" Nullable="false" />
+          <Property Name="senderPlayer" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="receiverPlayer" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="notificationState" Type="Int32" />
+          <NavigationProperty Name="Players" Relationship="Self.FK_receiverPlayer" FromRole="Notifications" ToRole="Players" />
+          <NavigationProperty Name="Players1" Relationship="Self.FK_senderPlayer" FromRole="Notifications" ToRole="Players" />
+        </EntityType>
+        <EntityType Name="Players">
+          <Key>
+            <PropertyRef Name="username" />
+          </Key>
+          <Property Name="username" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="email" Type="String" MaxLength="150" FixedLength="false" Unicode="true" />
+          <Property Name="userPassword" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="highestScore" Type="Int32" />
+          <Property Name="profilePictureId" Type="Int32" />
+          <Property Name="celebrationId" Type="Int32" />
+          <NavigationProperty Name="BlockedPlayers" Relationship="Self.FK_blockedPlayer" FromRole="Players" ToRole="BlockedPlayers" />
+          <NavigationProperty Name="BlockedPlayers1" Relationship="Self.FK_player" FromRole="Players" ToRole="BlockedPlayers" />
+          <NavigationProperty Name="Celebrations" Relationship="Self.FK_celebrationId" FromRole="Players" ToRole="Celebrations" />
+          <NavigationProperty Name="Friends" Relationship="Self.FK_friend" FromRole="Players" ToRole="Friends" />
+          <NavigationProperty Name="Friends1" Relationship="Self.FK_principalPlayer" FromRole="Players" ToRole="Friends" />
+          <NavigationProperty Name="Notifications" Relationship="Self.FK_receiverPlayer" FromRole="Players" ToRole="Notifications" />
+          <NavigationProperty Name="Notifications1" Relationship="Self.FK_senderPlayer" FromRole="Players" ToRole="Notifications" />
+          <NavigationProperty Name="ProfilePictures" Relationship="Self.FK_profilePictureId" FromRole="Players" ToRole="ProfilePictures" />
+        </EntityType>
+        <EntityType Name="ProfilePictures">
+          <Key>
+            <PropertyRef Name="profilePictureId" />
+          </Key>
+          <Property Name="profilePictureId" Type="Int32" Nullable="false" />
+          <Property Name="profilePictureRoute" Type="String" MaxLength="1000" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Players" Relationship="Self.FK_profilePictureId" FromRole="ProfilePictures" ToRole="Players" />
+        </EntityType>
+        <EntityType Name="Questions">
+          <Key>
+            <PropertyRef Name="questionId" />
+          </Key>
+          <Property Name="questionId" Type="Int32" Nullable="false" />
+          <Property Name="questionES" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="questionEN" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="answerES" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="answerEN" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK_blockedPlayer">
+          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
+          <End Role="BlockedPlayers" Type="Self.BlockedPlayers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="username" />
+            </Principal>
+            <Dependent Role="BlockedPlayers">
+              <PropertyRef Name="player" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_player">
+          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
+          <End Role="BlockedPlayers" Type="Self.BlockedPlayers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="username" />
+            </Principal>
+            <Dependent Role="BlockedPlayers">
+              <PropertyRef Name="player" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_celebrationId">
+          <End Role="Celebrations" Type="Self.Celebrations" Multiplicity="0..1" />
+          <End Role="Players" Type="Self.Players" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Celebrations">
+              <PropertyRef Name="celebrationId" />
+            </Principal>
+            <Dependent Role="Players">
+              <PropertyRef Name="celebrationId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_friend">
+          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
+          <End Role="Friends" Type="Self.Friends" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="username" />
+            </Principal>
+            <Dependent Role="Friends">
+              <PropertyRef Name="friend" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_principalPlayer">
+          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
+          <End Role="Friends" Type="Self.Friends" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="username" />
+            </Principal>
+            <Dependent Role="Friends">
+              <PropertyRef Name="principalPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_receiverPlayer">
+          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
+          <End Role="Notifications" Type="Self.Notifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="username" />
+            </Principal>
+            <Dependent Role="Notifications">
+              <PropertyRef Name="receiverPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_senderPlayer">
+          <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
+          <End Role="Notifications" Type="Self.Notifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Players">
+              <PropertyRef Name="username" />
+            </Principal>
+            <Dependent Role="Notifications">
+              <PropertyRef Name="senderPlayer" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_profilePictureId">
+          <End Role="ProfilePictures" Type="Self.ProfilePictures" Multiplicity="0..1" />
+          <End Role="Players" Type="Self.Players" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProfilePictures">
+              <PropertyRef Name="profilePictureId" />
+            </Principal>
+            <Dependent Role="Players">
+              <PropertyRef Name="profilePictureId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="WitsAndWagersEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="BlockedPlayers" EntityType="Self.BlockedPlayers" />
+          <EntitySet Name="Celebrations" EntityType="Self.Celebrations" />
+          <EntitySet Name="Friends" EntityType="Self.Friends" />
+          <EntitySet Name="Notifications" EntityType="Self.Notifications" />
+          <EntitySet Name="Players" EntityType="Self.Players" />
+          <EntitySet Name="ProfilePictures" EntityType="Self.ProfilePictures" />
+          <EntitySet Name="Questions" EntityType="Self.Questions" />
+          <AssociationSet Name="FK_blockedPlayer" Association="Self.FK_blockedPlayer">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="BlockedPlayers" EntitySet="BlockedPlayers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_player" Association="Self.FK_player">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="BlockedPlayers" EntitySet="BlockedPlayers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_celebrationId" Association="Self.FK_celebrationId">
+            <End Role="Celebrations" EntitySet="Celebrations" />
+            <End Role="Players" EntitySet="Players" />
+          </AssociationSet>
+          <AssociationSet Name="FK_friend" Association="Self.FK_friend">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="Friends" EntitySet="Friends" />
+          </AssociationSet>
+          <AssociationSet Name="FK_principalPlayer" Association="Self.FK_principalPlayer">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="Friends" EntitySet="Friends" />
+          </AssociationSet>
+          <AssociationSet Name="FK_receiverPlayer" Association="Self.FK_receiverPlayer">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="Notifications" EntitySet="Notifications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_senderPlayer" Association="Self.FK_senderPlayer">
+            <End Role="Players" EntitySet="Players" />
+            <End Role="Notifications" EntitySet="Notifications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_profilePictureId" Association="Self.FK_profilePictureId">
+            <End Role="ProfilePictures" EntitySet="ProfilePictures" />
+            <End Role="Players" EntitySet="Players" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="WitsAndWagersModelStoreContainer" CdmEntityContainer="WitsAndWagersEntities">
+          <EntitySetMapping Name="BlockedPlayers">
+            <EntityTypeMapping TypeName="WitsAndWagersModel.BlockedPlayers">
+              <MappingFragment StoreEntitySet="BlockedPlayers">
+                <ScalarProperty Name="blockId" ColumnName="blockId" />
+                <ScalarProperty Name="player" ColumnName="player" />
+                <ScalarProperty Name="blockedPlayer" ColumnName="blockedPlayer" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Celebrations">
+            <EntityTypeMapping TypeName="WitsAndWagersModel.Celebrations">
+              <MappingFragment StoreEntitySet="Celebrations">
+                <ScalarProperty Name="celebrationId" ColumnName="celebrationId" />
+                <ScalarProperty Name="celebrationRoute" ColumnName="celebrationRoute" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Friends">
+            <EntityTypeMapping TypeName="WitsAndWagersModel.Friends">
+              <MappingFragment StoreEntitySet="Friends">
+                <ScalarProperty Name="friendshipId" ColumnName="friendshipId" />
+                <ScalarProperty Name="principalPlayer" ColumnName="principalPlayer" />
+                <ScalarProperty Name="friend" ColumnName="friend" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Notifications">
+            <EntityTypeMapping TypeName="WitsAndWagersModel.Notifications">
+              <MappingFragment StoreEntitySet="Notifications">
+                <ScalarProperty Name="notificationId" ColumnName="notificationId" />
+                <ScalarProperty Name="senderPlayer" ColumnName="senderPlayer" />
+                <ScalarProperty Name="receiverPlayer" ColumnName="receiverPlayer" />
+                <ScalarProperty Name="notificationState" ColumnName="notificationState" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Players">
+            <EntityTypeMapping TypeName="WitsAndWagersModel.Players">
+              <MappingFragment StoreEntitySet="Players">
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="userPassword" ColumnName="userPassword" />
+                <ScalarProperty Name="highestScore" ColumnName="highestScore" />
+                <ScalarProperty Name="profilePictureId" ColumnName="profilePictureId" />
+                <ScalarProperty Name="celebrationId" ColumnName="celebrationId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ProfilePictures">
+            <EntityTypeMapping TypeName="WitsAndWagersModel.ProfilePictures">
+              <MappingFragment StoreEntitySet="ProfilePictures">
+                <ScalarProperty Name="profilePictureId" ColumnName="profilePictureId" />
+                <ScalarProperty Name="profilePictureRoute" ColumnName="profilePictureRoute" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Questions">
+            <EntityTypeMapping TypeName="WitsAndWagersModel.Questions">
+              <MappingFragment StoreEntitySet="Questions">
+                <ScalarProperty Name="questionId" ColumnName="questionId" />
+                <ScalarProperty Name="questionES" ColumnName="questionES" />
+                <ScalarProperty Name="questionEN" ColumnName="questionEN" />
+                <ScalarProperty Name="answerES" ColumnName="answerES" />
+                <ScalarProperty Name="answerEN" ColumnName="answerEN" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

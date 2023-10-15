@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="c5139592f74242d49f937fc4dd0d2f5d" Name="Diagram1">
+        <EntityTypeShape EntityType="WitsAndWagersModel.BlockedPlayers" Width="1.5" PointX="5.25" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="WitsAndWagersModel.Celebrations" Width="1.5" PointX="0.75" PointY="4.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="WitsAndWagersModel.Friends" Width="1.5" PointX="5.25" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="WitsAndWagersModel.Notifications" Width="1.5" PointX="5.25" PointY="6.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="WitsAndWagersModel.Players" Width="1.5" PointX="3" PointY="3.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="WitsAndWagersModel.ProfilePictures" Width="1.5" PointX="0.75" PointY="1.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="WitsAndWagersModel.Questions" Width="1.5" PointX="7.75" PointY="0.75" IsExpanded="true" />
+        <AssociationConnector Association="WitsAndWagersModel.FK_blockedPlayer" ManuallyRouted="false" />
+        <AssociationConnector Association="WitsAndWagersModel.FK_player" ManuallyRouted="false" />
+        <AssociationConnector Association="WitsAndWagersModel.FK_celebrationId" ManuallyRouted="false" />
+        <AssociationConnector Association="WitsAndWagersModel.FK_friend" ManuallyRouted="false" />
+        <AssociationConnector Association="WitsAndWagersModel.FK_principalPlayer" ManuallyRouted="false" />
+        <AssociationConnector Association="WitsAndWagersModel.FK_receiverPlayer" ManuallyRouted="false" />
+        <AssociationConnector Association="WitsAndWagersModel.FK_senderPlayer" ManuallyRouted="false" />
+        <AssociationConnector Association="WitsAndWagersModel.FK_profilePictureId" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
