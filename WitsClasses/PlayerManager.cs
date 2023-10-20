@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
+using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,8 +12,29 @@ using WitsClasses.Contracts;
 
 namespace WitsClasses
 {
-    public class PlayerManager : IPlayerManager
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+    public class PlayerManager : IPlayerManager, IConnectedUsers
     {
+
+        private static PlayerManager instance; //
+        private List<string> connectedUsers = new List<string>(); // Lista para almacenar los usuarios conectados
+
+        private PlayerManager()
+        {
+        }
+
+        // Método estático para obtener la instancia única
+        public static PlayerManager GetInstance()
+        {
+            if (instance == null)
+            {
+                instance = new PlayerManager();
+            }
+            return instance;
+        }
+
+
+
         public int AddPlayer(Player player)
         {
             int affectedTables = 0;
@@ -43,6 +65,25 @@ namespace WitsClasses
 
             return affectedTables;
         }
+
+        public List<string> GetConnectedUsers()
+        {
+            return connectedUsers; // Devuelve la lista de usuarios conectados
+            Console.WriteLine( "AQUI TIENE QUE REGRESAR ALGO" + connectedUsers);
+        }
+
+        public void AddConnectedUser(string username)
+        {
+            connectedUsers.Add(username); // Agrega al usuario a la lista de usuarios conectados
+            Console.WriteLine("SÍ ENTRÓ A ADD USERNAME " + username);
+
+            Console.WriteLine("AQUÍ IMPRIMO LOS USUARIOS CONECTADOS:");
+            foreach (string user in connectedUsers)
+            {
+                Console.WriteLine(user);
+            }
+        }
+
 
         public Player GetPlayerByUser(string username)
         {
@@ -101,6 +142,9 @@ namespace WitsClasses
                             celebrationId = (int)player.celebrationId
                         };
 
+                        // Agrega al usuario a la lista de usuarios conectados
+                        AddConnectedUser(username);
+
                         return foundPlayer;
                     }
                     else
@@ -115,5 +159,15 @@ namespace WitsClasses
                 }
             }
         }
+
+        public void PrintConnectedUsers()
+        {
+            Console.WriteLine("Connected Users:");
+            List<string> currentConnectedUsers = GetConnectedUsers(); // Obtén la lista actualizada
+            foreach (var user in currentConnectedUsers)
+            {
+                Console.WriteLine(user);
+            }
+        }
     }
-}
+    }

@@ -61,6 +61,7 @@
     <Compile Include="Celebrations.cs">
       <DependentUpon>WitsDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Contracts\IConnectedUsers.cs" />
     <Compile Include="Friends.cs">
       <DependentUpon>WitsDB.tt</DependentUpon>
     </Compile>
