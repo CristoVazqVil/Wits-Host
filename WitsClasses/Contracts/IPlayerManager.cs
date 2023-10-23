@@ -19,6 +19,8 @@ namespace WitsClasses.Contracts
 
         [OperationContract]
         Player GetPlayerByUserAndPassword(String username, String userPassword);
+
+
     }
 
     [DataContract]
