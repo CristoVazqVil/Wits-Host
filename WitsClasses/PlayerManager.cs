@@ -16,8 +16,8 @@ namespace WitsClasses
     public class PlayerManager : IPlayerManager, IConnectedUsers
     {
 
-        private static PlayerManager instance; //
-        private List<string> connectedUsers = new List<string>(); // Lista para almacenar los usuarios conectados
+        private static PlayerManager instance; 
+        private List<string> connectedUsers = new List<string>(); 
         private string currentLoggedInUser = null;
 
 
@@ -25,7 +25,6 @@ namespace WitsClasses
         {
         }
 
-        // Método estático para obtener la instancia única
         public static PlayerManager GetInstance()
         {
             if (instance == null)
@@ -70,16 +69,14 @@ namespace WitsClasses
 
         public List<string> GetConnectedUsers()
         {
-            return connectedUsers; // Devuelve la lista de usuarios conectados
-            Console.WriteLine("AQUI TIENE QUE REGRESAR ALGO" + connectedUsers);
+            return connectedUsers; 
         }
 
         public void AddConnectedUser(string username)
         {
-            connectedUsers.Add(username); // Agrega al usuario a la lista de usuarios conectados
-            Console.WriteLine("SÍ ENTRÓ A ADD USERNAME " + username);
-
-            Console.WriteLine("AQUÍ IMPRIMO LOS USUARIOS CONECTADOS:");
+            connectedUsers.Add(username);
+            
+            Console.WriteLine("CONNECTED USERS:");
             foreach (string user in connectedUsers)
             {
                 Console.WriteLine(user);
@@ -178,7 +175,7 @@ namespace WitsClasses
         public void PrintConnectedUsers()
         {
             Console.WriteLine("Connected Users:");
-            List<string> currentConnectedUsers = GetConnectedUsers(); // Obtén la lista actualizada
+            List<string> currentConnectedUsers = GetConnectedUsers(); 
             foreach (var user in currentConnectedUsers)
             {
                 Console.WriteLine(user);

@@ -15,19 +15,6 @@ namespace WitsHost
                 host.Open();
                 Console.WriteLine("Wits And Wagers is running");
 
-                // Obtiene la instancia única de PlayerManager
-                var connectedUsersService = WitsClasses.PlayerManager.GetInstance();
-
-                // Ciclo en segundo plano para actualizar la lista cada 10 segundos
-                Task.Run(async () =>
-                {
-                    while (true)
-                    {
-                        await Task.Delay(10000); // Espera 10 segundos
-                        connectedUsersService.PrintConnectedUsers(); // Imprime la lista de usuarios conectados
-                    }
-                });
-
                 Console.ReadLine();
             }
         }
