@@ -18,6 +18,8 @@ namespace WitsClasses
 
         private static PlayerManager instance; //
         private List<string> connectedUsers = new List<string>(); // Lista para almacenar los usuarios conectados
+        private string currentLoggedInUser = null;
+
 
         private PlayerManager()
         {
@@ -69,7 +71,7 @@ namespace WitsClasses
         public List<string> GetConnectedUsers()
         {
             return connectedUsers; // Devuelve la lista de usuarios conectados
-            Console.WriteLine( "AQUI TIENE QUE REGRESAR ALGO" + connectedUsers);
+            Console.WriteLine("AQUI TIENE QUE REGRESAR ALGO" + connectedUsers);
         }
 
         public void AddConnectedUser(string username)
@@ -142,7 +144,7 @@ namespace WitsClasses
                             celebrationId = (int)player.celebrationId
                         };
 
-                        // Agrega al usuario a la lista de usuarios conectados
+                        currentLoggedInUser = username;
                         AddConnectedUser(username);
 
                         return foundPlayer;
@@ -160,6 +162,19 @@ namespace WitsClasses
             }
         }
 
+        public void RemoveConnectedUser(string username)
+        {
+            connectedUsers.Remove(username);
+        }
+
+        public string GetCurrentlyLoggedInUser()
+        {
+            return currentLoggedInUser;
+            Console.WriteLine( "CUURENT " + currentLoggedInUser);
+
+        }
+
+
         public void PrintConnectedUsers()
         {
             Console.WriteLine("Connected Users:");
@@ -170,4 +185,7 @@ namespace WitsClasses
             }
         }
     }
-    }
+
+
+
+}

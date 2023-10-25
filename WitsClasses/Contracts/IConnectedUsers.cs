@@ -14,5 +14,11 @@ namespace WitsClasses.Contracts
 
         [OperationContract]
         void PrintConnectedUsers();
+
+        [OperationContract]
+        void RemoveConnectedUser(string username);
+
+        [OperationContract]
+        string GetCurrentlyLoggedInUser();
     }
 }
