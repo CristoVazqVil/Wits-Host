@@ -16,8 +16,8 @@ namespace WitsClasses
     public class PlayerManager : IPlayerManager, IConnectedUsers
     {
 
-        private static PlayerManager instance; 
-        private List<string> connectedUsers = new List<string>(); 
+        private static PlayerManager instance;
+        private List<string> connectedUsers = new List<string>();
         private string currentLoggedInUser = null;
 
 
@@ -69,13 +69,13 @@ namespace WitsClasses
 
         public List<string> GetConnectedUsers()
         {
-            return connectedUsers; 
+            return connectedUsers;
         }
 
         public void AddConnectedUser(string username)
         {
             connectedUsers.Add(username);
-            
+
             Console.WriteLine("CONNECTED USERS:");
             foreach (string user in connectedUsers)
             {
@@ -167,7 +167,7 @@ namespace WitsClasses
         public string GetCurrentlyLoggedInUser()
         {
             return currentLoggedInUser;
-            Console.WriteLine( "CUURENT " + currentLoggedInUser);
+            Console.WriteLine("CUURENT " + currentLoggedInUser);
 
         }
 
@@ -175,14 +175,46 @@ namespace WitsClasses
         public void PrintConnectedUsers()
         {
             Console.WriteLine("Connected Users:");
-            List<string> currentConnectedUsers = GetConnectedUsers(); 
+            List<string> currentConnectedUsers = GetConnectedUsers();
             foreach (var user in currentConnectedUsers)
             {
                 Console.WriteLine(user);
             }
         }
+
+
+        public Question GetQuestionByID(int questionId)
+        {
+            using (var context = new WitsAndWagersEntities())
+            {
+                context.Database.Log = Console.WriteLine;
+                try
+                {
+                    var question = context.Questions.Find(questionId);
+
+                    if (question != null)
+                    {
+                        Question foundQuestion = new Question
+                        {
+                            questionES = question.questionES,
+                            questionEN = question.questionEN,
+                            answerES = question.answerES,
+                            answerEN = question.answerEN
+                        };
+
+                        return foundQuestion;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return null;
+                }
+            }
+        }
     }
-
-
-
 }
