@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using WitsClasses.Contracts;
 
 namespace WitsHost
 {
@@ -13,9 +12,9 @@ namespace WitsHost
         {
             using (ServiceHost host = new ServiceHost(typeof(WitsClasses.PlayerManager)))
             {
-
                 host.Open();
                 Console.WriteLine("Wits And Wagers is running");
+
                 Console.ReadLine();
             }
         }
