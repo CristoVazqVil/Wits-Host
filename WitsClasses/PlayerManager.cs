@@ -115,5 +115,39 @@ namespace WitsClasses
                 }
             }
         }
+
+        public Question GetQuestionByID(int questionId)
+        {
+            using (var context = new WitsAndWagersEntities())
+            {
+                context.Database.Log = Console.WriteLine;
+                try
+                {
+                    var question = context.Questions.Find(questionId);
+
+                    if (question != null)
+                    {
+                        Question foundQuestion = new Question
+                        {
+                            questionES = question.questionES,
+                            questionEN = question.questionEN,
+                            answerES = question.answerES,
+                            answerEN = question.answerEN
+                        };
+
+                        return foundQuestion;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return null;
+                }
+            }
+        }
     }
 }
