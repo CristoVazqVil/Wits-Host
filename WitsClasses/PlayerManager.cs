@@ -166,9 +166,8 @@ namespace WitsClasses
 
         public string GetCurrentlyLoggedInUser()
         {
-            return currentLoggedInUser;
             Console.WriteLine("CUURENT " + currentLoggedInUser);
-
+            return currentLoggedInUser;
         }
 
 
@@ -208,6 +207,34 @@ namespace WitsClasses
                     {
                         return null;
                     }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return null;
+                }
+            }
+        }
+
+        public List<string> GetConnectedFriends(string principalPlayer, List<string> allConnectedUsers)
+        {
+            List<string> connectedFirends = new List<string>();
+
+            using (var context = new WitsAndWagersEntities())
+            {
+                context.Database.Log = Console.WriteLine;
+                try
+                {
+                    foreach (string friend in allConnectedUsers)
+                    {
+                        var friendship = context.Friends.FirstOrDefault(p => p.principalPlayer == principalPlayer && p.friend == friend);
+                        if (friendship != null)
+                        {
+                            connectedFirends.Add(friend);
+                        }
+                    }
+
+                    return connectedFirends;
                 }
                 catch (SqlException ex)
                 {

@@ -20,5 +20,8 @@ namespace WitsClasses.Contracts
 
         [OperationContract]
         string GetCurrentlyLoggedInUser();
+
+        [OperationContract]
+        List<string> GetConnectedFriends(string principalPlayer, List<string> allConnectedUsers);
     }
 }
