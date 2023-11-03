@@ -23,6 +23,10 @@ namespace WitsClasses.Contracts
         [OperationContract]
         Question GetQuestionByID(int questionId);
 
+        [OperationContract]
+        bool UpdateProfilePicture(string username, int profilePictureId);
+
+
 
     }
 
