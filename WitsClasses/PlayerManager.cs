@@ -185,6 +185,32 @@ namespace WitsClasses
         }
 
 
+        public bool UpdateCelebration(string username, int celebrationId)
+        {
+            using (var context = new WitsAndWagersEntities())
+            {
+                context.Database.Log = Console.WriteLine;
+                try
+                {
+                    var player = context.Players.FirstOrDefault(p => p.username == username);
+
+                    if (player != null)
+                    {
+                        player.celebrationId = celebrationId;
+                        context.SaveChanges();
+                        return true;
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            return false;
+        }
+
+
         public void RemoveConnectedUser(string username)
         {
             connectedUsers.Remove(username);

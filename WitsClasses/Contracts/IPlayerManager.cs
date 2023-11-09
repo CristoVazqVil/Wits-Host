@@ -26,7 +26,8 @@ namespace WitsClasses.Contracts
         [OperationContract]
         bool UpdateProfilePicture(string username, int profilePictureId);
 
-
+        [OperationContract]
+        bool UpdateCelebration(string username, int celebrationId);
 
     }
 
