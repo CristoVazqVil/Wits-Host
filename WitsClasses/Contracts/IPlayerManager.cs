@@ -22,6 +22,13 @@ namespace WitsClasses.Contracts
 
         [OperationContract]
         Question GetQuestionByID(int questionId);
+
+        [OperationContract]
+        bool UpdateProfilePicture(string username, int profilePictureId);
+
+        [OperationContract]
+        bool UpdateCelebration(string username, int celebrationId);
+
     }
 
     [DataContract]
