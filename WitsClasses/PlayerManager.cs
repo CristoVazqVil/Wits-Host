@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -12,14 +13,15 @@ using WitsClasses.Contracts;
 
 namespace WitsClasses
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
-    public class PlayerManager : IPlayerManager, IConnectedUsers
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Reentrant)]
+    public partial class PlayerManager : IPlayerManager, IConnectedUsers, IGameService, IChatManager
     {
-
+        private static readonly ILog witslogger = LogManager.GetLogger(typeof(PlayerManager));
+        private Dictionary<string, IChatManagerCallback> userContexts = new Dictionary<string, IChatManagerCallback>();
         private static PlayerManager instance;
         private List<string> connectedUsers = new List<string>();
+        private List<Game> games = new List<Game>();
         private string currentLoggedInUser = null;
-
 
         private PlayerManager()
         {
@@ -58,7 +60,7 @@ namespace WitsClasses
                 }
                 catch (EntityException ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    witslogger.Error(ex);
                     affectedTables = 0;
                     return affectedTables;
                 }
@@ -114,7 +116,7 @@ namespace WitsClasses
                 }
                 catch (SqlException ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    witslogger.Error(ex);
                     return null;
                 }
             }
@@ -153,7 +155,7 @@ namespace WitsClasses
                 }
                 catch (SqlException ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    witslogger.Error(ex);
                     return null;
                 }
             }
@@ -166,7 +168,7 @@ namespace WitsClasses
 
         public string GetCurrentlyLoggedInUser()
         {
-            Console.WriteLine("CUURENT " + currentLoggedInUser);
+            Console.WriteLine("CURRENT " + currentLoggedInUser);
             return currentLoggedInUser;
         }
 
@@ -181,6 +183,26 @@ namespace WitsClasses
             }
         }
 
+        public void RegisterUserContext(string username)
+        {
+            if (!userContexts.ContainsKey(username))
+            {
+                IChatManagerCallback currentUserCallbackChannel = OperationContext.Current.GetCallbackChannel<IChatManagerCallback>();
+                userContexts.Add(username, currentUserCallbackChannel);
+            }
+        }
+
+        public void UnregisterUserContext(string username)
+        {
+            lock (userContexts)
+            {
+                if (userContexts.ContainsKey(username))
+                {
+                    userContexts.Remove(username);
+                }
+            }
+        }
+
 
         public Question GetQuestionByID(int questionId)
         {
@@ -190,27 +212,20 @@ namespace WitsClasses
                 try
                 {
                     var question = context.Questions.Find(questionId);
+                    Question foundQuestion = new Question();
 
                     if (question != null)
                     {
-                        Question foundQuestion = new Question
-                        {
-                            questionES = question.questionES,
-                            questionEN = question.questionEN,
-                            answerES = question.answerES,
-                            answerEN = question.answerEN
-                        };
-
-                        return foundQuestion;
+                        foundQuestion.questionES = question.questionES;
+                        foundQuestion.questionEN = question.questionEN;
+                        foundQuestion.answerES = question.answerES;
+                        foundQuestion.answerEN = question.answerEN;
                     }
-                    else
-                    {
-                        return null;
-                    }
+                    return foundQuestion;
                 }
                 catch (SqlException ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    witslogger.Error(ex);
                     return null;
                 }
             }
@@ -238,8 +253,104 @@ namespace WitsClasses
                 }
                 catch (SqlException ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    witslogger.Error(ex);
                     return null;
+                }
+            }
+        }
+
+        //Game Service Implementation
+        public void CreateGame(int gameId, string gameLeader, int numberOfPlayers)
+        {
+            if (games.Any(g => g.GameId == gameId))
+            {
+                throw new ApplicationException("Used ID");
+            }
+
+            var newGame = new Game(gameId, gameLeader, numberOfPlayers);
+            newGame.PlayerScores.Add(gameLeader, 0);
+            games.Add(newGame);
+        }
+
+        public int JoinGame(int gameId, string playerId)
+        {
+            int returnValue = 0;
+            var game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                if (!game.PlayerScores.ContainsKey(playerId))
+                {
+                    game.PlayerScores.Add(playerId, 0);
+                    returnValue = 1;
+                }
+                return returnValue;
+            }
+            else
+            {
+                return returnValue;
+            }
+        }
+
+        public Dictionary<string, int> GetScores(int gameId)
+        {
+            var game = games.FirstOrDefault(g => g.GameId == gameId);
+            return game?.PlayerScores;
+        }
+
+        public void ModifyScore(int gameId, string playerId, int points)
+        {
+            var game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game?.PlayerScores.ContainsKey(playerId) == true)
+            {
+                game.PlayerScores[playerId] += points;
+            }
+        }
+
+        public int GetPlayerScore(int gameId, string playerId)
+        {
+            var game = games.First(g => g.GameId == gameId);
+            return game.PlayerScores[playerId];
+        }
+
+        public string GetGameLeader(int gameId)
+        {
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            return game.GameLeader;
+        }
+        
+    }
+
+    public partial class PlayerManager: IChatManager
+    {
+        public void SendNewMessage(string message, int gameId)
+        {
+            OperationContext currentContext = OperationContext.Current;
+
+            if (currentContext == null)
+            {
+                return;
+            }
+
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                List<string> playerIds = new List<string>();
+
+                foreach (string playerName in game.PlayerScores.Keys)
+                {
+                    playerIds.Add(playerName);
+                }
+
+                foreach (string userInGame in playerIds)
+                {
+                    try
+                    {
+                        userContexts[userInGame].UpdateChat(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        witslogger.Error(ex);
+                    }
                 }
             }
         }
