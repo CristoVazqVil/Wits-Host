@@ -19,5 +19,6 @@ namespace WitsClasses
         public string questionEN { get; set; }
         public string answerES { get; set; }
         public string answerEN { get; set; }
+        public Nullable<int> trueAnswer { get; set; }
     }
 }

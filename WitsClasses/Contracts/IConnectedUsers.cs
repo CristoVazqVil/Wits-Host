@@ -12,9 +12,7 @@ namespace WitsClasses.Contracts
         [OperationContract]
         List<string> GetConnectedUsers();
 
-        [OperationContract]
-        void PrintConnectedUsers();
-
+        
         [OperationContract]
         void RemoveConnectedUser(string username);
 

@@ -225,15 +225,7 @@ namespace WitsClasses
         }
 
 
-        public void PrintConnectedUsers()
-        {
-            Console.WriteLine("Connected Users:");
-            List<string> currentConnectedUsers = GetConnectedUsers();
-            foreach (var user in currentConnectedUsers)
-            {
-                Console.WriteLine(user);
-            }
-        }
+       
 
         public void RegisterUserContext(string username)
         {
@@ -311,7 +303,6 @@ namespace WitsClasses
             }
         }
 
-        //Game Service Implementation
         public void CreateGame(int gameId, string gameLeader, int numberOfPlayers)
         {
             if (games.Any(g => g.GameId == gameId))
