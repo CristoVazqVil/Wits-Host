@@ -64,6 +64,7 @@
           <Property Name="questionEN" Type="nvarchar" MaxLength="500" />
           <Property Name="answerES" Type="nvarchar" MaxLength="500" />
           <Property Name="answerEN" Type="nvarchar" MaxLength="500" />
+          <Property Name="trueAnswer" Type="int" />
         </EntityType>
         <Association Name="FK_blockedPlayer">
           <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
@@ -281,6 +282,7 @@
           <Property Name="questionEN" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="answerES" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="answerEN" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="trueAnswer" Type="Int32" />
         </EntityType>
         <Association Name="FK_blockedPlayer">
           <End Role="Players" Type="Self.Players" Multiplicity="0..1" />
@@ -484,6 +486,7 @@
           <EntitySetMapping Name="Questions">
             <EntityTypeMapping TypeName="WitsAndWagersModel.Questions">
               <MappingFragment StoreEntitySet="Questions">
+                <ScalarProperty Name="trueAnswer" ColumnName="trueAnswer" />
                 <ScalarProperty Name="questionId" ColumnName="questionId" />
                 <ScalarProperty Name="questionES" ColumnName="questionES" />
                 <ScalarProperty Name="questionEN" ColumnName="questionEN" />

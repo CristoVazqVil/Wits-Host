@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace WitsClasses.Contracts
 {
     [ServiceContract]
-    public interface IGameService
+    public interface IGameManager
     {
         [OperationContract]
         void CreateGame(int gameId, string gameLeader, int numberOfPlayers);
@@ -29,6 +29,8 @@ namespace WitsClasses.Contracts
         [OperationContract]
         string GetGameLeader(int gameId);
 
+        [OperationContract]
+        Question GetQuestionByID(int questionId);
     }
 
     [DataContract]
@@ -58,5 +60,29 @@ namespace WitsClasses.Contracts
             NumberOfPlayers = numberOfPlayers;
             PlayerScores = new Dictionary<string, int>();
         }
+    }
+
+    public class Question
+    {
+        public String questionES;
+        public String answerES;
+        public String questionEN;
+        public String answerEN;
+        public int trueAnswer;
+
+        [DataMember]
+        public String QuestionES { get { return questionES; } set { questionES = value; } }
+
+        [DataMember]
+        public String AnswerES { get { return answerES; } set { answerES = value; } }
+
+        [DataMember]
+        public String QuestionEN { get { return questionEN; } set { questionEN = value; } }
+
+        [DataMember]
+        public String AnswerEN { get { return answerEN; } set { answerEN = value; } }
+
+        [DataMember]
+        public int TrueAnswer { get { return trueAnswer; } set { trueAnswer = value; } }
     }
 }
