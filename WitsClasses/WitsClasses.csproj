@@ -68,7 +68,7 @@
     </Compile>
     <Compile Include="Contracts\IChatManager.cs" />
     <Compile Include="Contracts\IConnectedUsers.cs" />
-    <Compile Include="Contracts\IGameService.cs" />
+    <Compile Include="Contracts\IGameManager.cs" />
     <Compile Include="Friends.cs">
       <DependentUpon>WitsDB.tt</DependentUpon>
     </Compile>

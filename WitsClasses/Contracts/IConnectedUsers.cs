@@ -17,9 +17,6 @@ namespace WitsClasses.Contracts
         void RemoveConnectedUser(string username);
 
         [OperationContract]
-        string GetCurrentlyLoggedInUser();
-
-        [OperationContract]
         List<string> GetConnectedFriends(string principalPlayer, List<string> allConnectedUsers);
     }
 }

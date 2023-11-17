@@ -21,9 +21,6 @@ namespace WitsClasses.Contracts
         Player GetPlayerByUserAndPassword(String username, String userPassword);
 
         [OperationContract]
-        Question GetQuestionByID(int questionId);
-
-        [OperationContract]
         bool UpdateProfilePicture(string username, int profilePictureId);
 
         [OperationContract]
@@ -60,23 +57,4 @@ namespace WitsClasses.Contracts
         public int CelebrationId { get { return celebrationId; } set { celebrationId = value; } }
     }
 
-    public class Question
-    {
-        public String questionES;
-        public String answerES;
-        public String questionEN;
-        public String answerEN;
-
-        [DataMember]
-        public String QuestionES { get { return questionES; } set { questionES = value; } }
-
-        [DataMember]
-        public String AnswerES { get { return answerES; } set { answerES = value; } }
-
-        [DataMember]
-        public String QuestionEN { get { return questionEN; } set { questionEN = value; } }
-
-        [DataMember]
-        public String AnswerEN { get { return answerEN; } set { answerEN = value; } }
-    }
 }

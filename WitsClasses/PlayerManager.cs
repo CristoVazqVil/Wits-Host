@@ -13,15 +13,14 @@ using WitsClasses.Contracts;
 
 namespace WitsClasses
 {
-    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Reentrant)]
-    public partial class PlayerManager : IPlayerManager, IConnectedUsers, IGameService, IChatManager
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
+    public partial class PlayerManager : IPlayerManager, IConnectedUsers, IGameManager, IChatManager
     {
         private static readonly ILog witslogger = LogManager.GetLogger(typeof(PlayerManager));
         private Dictionary<string, IChatManagerCallback> userContexts = new Dictionary<string, IChatManagerCallback>();
         private static PlayerManager instance;
         private List<string> connectedUsers = new List<string>();
         private List<Game> games = new List<Game>();
-        private string currentLoggedInUser = null;
 
         private PlayerManager()
         {
@@ -143,7 +142,6 @@ namespace WitsClasses
                             celebrationId = (int)player.celebrationId
                         };
 
-                        currentLoggedInUser = username;
                         AddConnectedUser(username);
 
                         return foundPlayer;
@@ -218,15 +216,6 @@ namespace WitsClasses
             connectedUsers.Remove(username);
         }
 
-        public string GetCurrentlyLoggedInUser()
-        {
-            Console.WriteLine("CURRENT " + currentLoggedInUser);
-            return currentLoggedInUser;
-        }
-
-
-       
-
         public void RegisterUserContext(string username)
         {
             if (!userContexts.ContainsKey(username))
@@ -264,6 +253,7 @@ namespace WitsClasses
                         foundQuestion.questionEN = question.questionEN;
                         foundQuestion.answerES = question.answerES;
                         foundQuestion.answerEN = question.answerEN;
+                        foundQuestion.trueAnswer = (int)question.trueAnswer;
                     }
                     return foundQuestion;
                 }
@@ -397,5 +387,6 @@ namespace WitsClasses
                 }
             }
         }
+
     }
 }
