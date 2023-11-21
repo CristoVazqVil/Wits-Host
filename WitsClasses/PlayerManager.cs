@@ -16,6 +16,9 @@ namespace WitsClasses
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
     public partial class PlayerManager : IPlayerManager, IConnectedUsers, IGameManager, IChatManager
     {
+        private const int PENDING = 0;
+        private const int ACCEPTED = 1;
+        private const int REJECTED = 2;
         private static readonly ILog witslogger = LogManager.GetLogger(typeof(PlayerManager));
         private Dictionary<string, IChatManagerCallback> userContexts = new Dictionary<string, IChatManagerCallback>();
         private static PlayerManager instance;
@@ -34,8 +37,6 @@ namespace WitsClasses
             }
             return instance;
         }
-
-
 
         public int AddPlayer(Player player)
         {
@@ -75,12 +76,15 @@ namespace WitsClasses
 
         public void AddConnectedUser(string username)
         {
-            connectedUsers.Add(username);
-
-            Console.WriteLine("CONNECTED USERS:");
-            foreach (string user in connectedUsers)
+            if (!connectedUsers.Contains(username))
             {
-                Console.WriteLine(user);
+                connectedUsers.Add(username);
+
+                Console.WriteLine("CONNECTED USERS:");
+                foreach (string user in connectedUsers)
+                {
+                    Console.WriteLine(user);
+                }
             }
         }
 
@@ -157,6 +161,341 @@ namespace WitsClasses
                     return null;
                 }
             }
+        }
+
+        public List<string> GetPlayerFriends(string playerUsername)
+        {
+            using (var context = new WitsAndWagersEntities())
+            {
+                context.Database.Log = Console.WriteLine;
+                try
+                {
+                    var friendUsernames = context.Friends
+                        .Where(f => f.principalPlayer == playerUsername)
+                        .Select(f => f.friend)
+                        .ToList();
+
+                    return friendUsernames;
+                }
+                catch (SqlException ex)
+                {
+                    witslogger.Error(ex);
+                    return new List<string>();
+                }
+            }
+        }
+
+        public List<string> GetAllPlayerRequests(string playerUsername)
+        {
+            using (var context = new WitsAndWagersEntities())
+            {
+                context.Database.Log = Console.WriteLine;
+                try
+                {
+                    var requests = context.Notifications
+                        .Where(n => n.receiverPlayer == playerUsername && n.notificationState == PENDING)
+                        .Select(n => n.senderPlayer)
+                        .ToList();
+
+                    return requests;
+                }
+                catch (SqlException ex)
+                {
+                    witslogger.Error(ex);
+                    return new List<string>();
+                }
+            }
+        }
+
+        public string GetPlayerRequest(string playerFrom, string playerTo)
+        {
+            string found = null;
+            using (var context = new WitsAndWagersEntities())
+            {
+                context.Database.Log = Console.WriteLine;
+                try
+                {
+                    var request = context.Notifications
+                        .Where(n => n.senderPlayer == playerFrom && n.receiverPlayer == playerTo && n.notificationState == PENDING)
+                        .Select(n => n.senderPlayer);
+
+                    if (request != null)
+                    {
+                        found = "Found";
+                    }
+
+                    return found;
+                }
+                catch (SqlException ex)
+                {
+                    witslogger.Error(ex);
+                    return null;
+                }
+            }
+        }
+
+        public int AddRequest(string from, string to)
+        {
+            int affectedTables = 0;
+
+            using (var context = new WitsAndWagersEntities())
+            {
+                try
+                {
+                    bool existingNotification = context.Notifications
+                    .Any(n => ((n.senderPlayer == from && n.receiverPlayer == to) || (n.receiverPlayer == from && n.senderPlayer == to)) && (n.notificationState == ACCEPTED || n.notificationState == PENDING));
+
+                    if (!existingNotification)
+                    {
+                        Notifications newNotification = new Notifications
+                        {
+                            senderPlayer = from,
+                            receiverPlayer = to,
+                            notificationState = PENDING
+                        }; 
+                        
+                        context.Notifications.Add(newNotification);
+                        affectedTables = context.SaveChanges();
+                    }
+                }
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
+                    return affectedTables;
+                }
+                
+            }
+            return affectedTables;
+        }
+
+        public int AcceptRequest(string receiver, string sender)
+        {
+            int affectedTables = 0;
+
+            using (var context = new WitsAndWagersEntities())
+            {
+                try
+                {
+                    var notificationToUpdate = context.Notifications
+                        .FirstOrDefault(n => n.senderPlayer == sender && n.receiverPlayer == receiver && n.notificationState == PENDING);
+
+                    if (notificationToUpdate != null)
+                    {
+                        notificationToUpdate.notificationState = ACCEPTED;
+                        affectedTables = context.SaveChanges();
+                    }
+                    else
+                    {
+                        affectedTables = 0;
+                    }
+                }
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
+                    return affectedTables;
+                }
+            }
+
+            return affectedTables;
+        }
+
+        public int RejectRequest(string receiver, string sender)
+        {
+            int affectedTables = 0;
+
+            using (var context = new WitsAndWagersEntities())
+            {
+                try
+                {
+                    var notificationToUpdate = context.Notifications
+                        .FirstOrDefault(n => n.senderPlayer == sender && n.receiverPlayer == receiver && n.notificationState == PENDING);
+
+                    if (notificationToUpdate != null)
+                    {
+                        notificationToUpdate.notificationState = REJECTED;
+                        affectedTables = context.SaveChanges();
+                    }
+                    else
+                    {
+                        affectedTables = 0;
+                    }
+                }
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
+                    return affectedTables;
+                }
+            }
+
+            return affectedTables;
+        }
+
+        public int DeleteRequest(string receiver, string sender, int status)
+        {
+            int affectedTables = 0;
+
+            using (var context = new WitsAndWagersEntities())
+            {
+                try
+                {
+                    var notificationToDelete = context.Notifications
+                        .FirstOrDefault(n => n.senderPlayer == sender && n.receiverPlayer == receiver && n.notificationState == status);
+
+                    if (notificationToDelete != null)
+                    {
+                        context.Notifications.Remove(notificationToDelete);
+                        affectedTables = context.SaveChanges();
+                    }
+                    else
+                    {
+                        affectedTables = 0;
+                    }
+                }
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
+                    return affectedTables;
+                }
+            }
+
+            return affectedTables;
+        }
+
+        public int AddFriendship(string player, string friend)
+        {
+            int affectedTables = 0;
+
+            using (var context = new WitsAndWagersEntities())
+            {
+                if (player == friend)
+                {
+                    affectedTables = 0;
+                }
+                else
+                {
+                    try
+                    {
+                        Friends newFriendship = new Friends
+                        {
+                            principalPlayer = player,
+                            friend = friend
+                        };
+
+                        context.Friends.Add(newFriendship);
+                        affectedTables = context.SaveChanges();
+                    }
+                    catch (EntityException ex)
+                    {
+                        witslogger.Error(ex);
+                        affectedTables = 0;
+                        return affectedTables;
+                    }
+                }
+            }
+
+            return affectedTables;
+        }
+
+        public int DeleteFriendship(string player, string friend)
+        {
+            int affectedTables = 0;
+
+            using (var context = new WitsAndWagersEntities())
+            {
+                if (player == friend)
+                {
+                    affectedTables = 0;
+                }
+                else
+                {
+                    try
+                    {
+                        var friendshipToDelete = context.Friends
+                            .FirstOrDefault(f => f.principalPlayer == player && f.friend == friend);
+
+                        if (friendshipToDelete != null)
+                        {
+                            context.Friends.Remove(friendshipToDelete);
+                            affectedTables = context.SaveChanges();
+                        }
+                        else
+                        {
+                            affectedTables = 0;
+                        }
+                    }
+                    catch (EntityException ex)
+                    {
+                        witslogger.Error(ex);
+                        affectedTables = 0;
+                        return affectedTables;
+                    }
+                }
+            }
+
+            return affectedTables;
+        }
+
+        public bool IsPlayerBlocked(string player, string blockedPlayer)
+        {
+            using (var context = new WitsAndWagersEntities())
+            {
+                try
+                {
+                    bool isBlocked = context.BlockedPlayers
+                        .Any(bp => bp.player == player && bp.blockedPlayer == blockedPlayer);
+
+                    return isBlocked;
+                }
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    return false;
+                }
+            }
+        }
+
+        public int BlockPlayer(string player, string blockedPlayer)
+        {
+            int affectedTables = 0;
+
+            using (var context = new WitsAndWagersEntities())
+            {
+                if (player == blockedPlayer)
+                {
+                    affectedTables = 0;
+                }
+                else
+                {
+                    try
+                    {
+                        bool isAlreadyBlocked = context.BlockedPlayers
+                            .Any(bp => bp.player == player && bp.blockedPlayer == blockedPlayer);
+
+                        if (!isAlreadyBlocked)
+                        {
+                            BlockedPlayers newBlockedPlayer = new BlockedPlayers
+                            {
+                                player = player,
+                                blockedPlayer = blockedPlayer
+                            };
+
+                            context.BlockedPlayers.Add(newBlockedPlayer);
+                            affectedTables = context.SaveChanges();
+                        }
+                    }
+                    catch (EntityException ex)
+                    {
+                        witslogger.Error(ex);
+                        affectedTables = 0;
+                    }
+                }
+            }
+
+            return affectedTables;
         }
 
         public bool UpdateProfilePicture(string username, int profilePictureId)
@@ -351,7 +690,6 @@ namespace WitsClasses
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
             return game.GameLeader;
         }
-        
     }
 
     public partial class PlayerManager: IChatManager

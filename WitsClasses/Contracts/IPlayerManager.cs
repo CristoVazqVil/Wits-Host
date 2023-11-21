@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -19,6 +20,39 @@ namespace WitsClasses.Contracts
 
         [OperationContract]
         Player GetPlayerByUserAndPassword(String username, String userPassword);
+
+        [OperationContract]
+        List<string> GetPlayerFriends(string playerUsername);
+
+        [OperationContract]
+        List<string> GetAllPlayerRequests(string playerUsername);
+
+        [OperationContract]
+        string GetPlayerRequest(string playerFrom, string playerTo);
+
+        [OperationContract]
+        int AddRequest(string from, string to);
+
+        [OperationContract]
+        int AcceptRequest(string receiver, string sender);
+
+        [OperationContract]
+        int RejectRequest(string receiver, string sender);
+
+        [OperationContract]
+        int DeleteRequest(string receiver, string sender, int status);
+
+        [OperationContract]
+        int AddFriendship(string player, string friend);
+
+        [OperationContract]
+        int DeleteFriendship(string player, string friend);
+
+        [OperationContract]
+        bool IsPlayerBlocked(string player, string blockedPlayer);
+
+        [OperationContract]
+        int BlockPlayer(string player, string blockedPlayer);
 
         [OperationContract]
         bool UpdateProfilePicture(string username, int profilePictureId);
@@ -56,5 +90,4 @@ namespace WitsClasses.Contracts
         [DataMember]
         public int CelebrationId { get { return celebrationId; } set { celebrationId = value; } }
     }
-
 }

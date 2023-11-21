@@ -9,7 +9,7 @@
           <Key>
             <PropertyRef Name="blockId" />
           </Key>
-          <Property Name="blockId" Type="int" Nullable="false" />
+          <Property Name="blockId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="player" Type="nvarchar" MaxLength="50" />
           <Property Name="blockedPlayer" Type="nvarchar" MaxLength="50" />
         </EntityType>
@@ -24,7 +24,7 @@
           <Key>
             <PropertyRef Name="friendshipId" />
           </Key>
-          <Property Name="friendshipId" Type="int" Nullable="false" />
+          <Property Name="friendshipId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="principalPlayer" Type="nvarchar" MaxLength="50" />
           <Property Name="friend" Type="nvarchar" MaxLength="50" />
         </EntityType>
@@ -32,7 +32,7 @@
           <Key>
             <PropertyRef Name="notificationId" />
           </Key>
-          <Property Name="notificationId" Type="int" Nullable="false" />
+          <Property Name="notificationId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="senderPlayer" Type="nvarchar" MaxLength="50" />
           <Property Name="receiverPlayer" Type="nvarchar" MaxLength="50" />
           <Property Name="notificationState" Type="int" />
