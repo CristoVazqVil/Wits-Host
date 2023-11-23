@@ -632,7 +632,6 @@ namespace WitsClasses
             }
         }
 
-        //Game Service Implementation
         public void CreateGame(int gameId, string gameLeader, int numberOfPlayers)
         {
             if (games.Any(g => g.GameId == gameId))
