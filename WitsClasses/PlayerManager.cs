@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
@@ -58,7 +59,7 @@ namespace WitsClasses
                     var newPlayer = context.Players.Add(newUser);
                     affectedTables = context.SaveChanges();
                 }
-                catch (EntityException ex)
+                catch (DbUpdateException ex)
                 {
                     witslogger.Error(ex);
                     affectedTables = 0;
