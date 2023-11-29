@@ -11,6 +11,9 @@ using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
 using WitsClasses.Contracts;
+using System.Windows;
+using System.Runtime.Remoting.Messaging;
+
 
 namespace WitsClasses
 {
@@ -21,14 +24,19 @@ namespace WitsClasses
         private const int ACCEPTED = 1;
         private const int REJECTED = 2;
         private static readonly ILog witslogger = LogManager.GetLogger(typeof(PlayerManager));
-        private Dictionary<string, IChatManagerCallback> userContexts = new Dictionary<string, IChatManagerCallback>();
+        private Dictionary<string, IChatManagerCallback> usersInLobbyContexts = new Dictionary<string, IChatManagerCallback>();
+        private Dictionary<string, IActiveGameCallback> usersInGameContexts = new Dictionary<string, IActiveGameCallback>();
         private static PlayerManager instance;
         private List<string> connectedUsers = new List<string>();
         private List<Game> games = new List<Game>();
+        private List<int> usedQuestionIds = new List<int>();
+        private Random random = new Random();
 
         private PlayerManager()
         {
         }
+
+
 
         public static PlayerManager GetInstance()
         {
@@ -253,8 +261,8 @@ namespace WitsClasses
                             senderPlayer = from,
                             receiverPlayer = to,
                             notificationState = PENDING
-                        }; 
-                        
+                        };
+
                         context.Notifications.Add(newNotification);
                         affectedTables = context.SaveChanges();
                     }
@@ -265,7 +273,7 @@ namespace WitsClasses
                     affectedTables = 0;
                     return affectedTables;
                 }
-                
+
             }
             return affectedTables;
         }
@@ -556,29 +564,25 @@ namespace WitsClasses
             connectedUsers.Remove(username);
         }
 
-        public void RegisterUserContext(string username)
+        public int GetRandomQuestionId()
         {
-            if (!userContexts.ContainsKey(username))
+            int newQuestionId;
+            do
             {
-                IChatManagerCallback currentUserCallbackChannel = OperationContext.Current.GetCallbackChannel<IChatManagerCallback>();
-                userContexts.Add(username, currentUserCallbackChannel);
-            }
+                newQuestionId = random.Next(1, 16);
+            } while (usedQuestionIds.Contains(newQuestionId));
+
+            usedQuestionIds.Add(newQuestionId);
+
+            return newQuestionId;
         }
 
-        public void UnregisterUserContext(string username)
-        {
-            lock (userContexts)
-            {
-                if (userContexts.ContainsKey(username))
-                {
-                    userContexts.Remove(username);
-                }
-            }
-        }
+
 
 
         public Question GetQuestionByID(int questionId)
         {
+
             using (var context = new WitsAndWagersEntities())
             {
                 context.Database.Log = Console.WriteLine;
@@ -633,15 +637,17 @@ namespace WitsClasses
             }
         }
 
-        public void CreateGame(int gameId, string gameLeader, int numberOfPlayers)
+        public void CreateGame(int gameId, string gameLeader)
         {
             if (games.Any(g => g.GameId == gameId))
             {
                 throw new ApplicationException("Used ID");
             }
 
-            var newGame = new Game(gameId, gameLeader, numberOfPlayers);
+            var newGame = new Game(gameId, gameLeader, 1);
             newGame.PlayerScores.Add(gameLeader, 0);
+            newGame.PlayerAnswers.Add(newGame.numberOfPlayers, "");
+
             games.Add(newGame);
         }
 
@@ -653,8 +659,10 @@ namespace WitsClasses
             {
                 if (!game.PlayerScores.ContainsKey(playerId))
                 {
+                    game.numberOfPlayers = game.numberOfPlayers + 1;
                     game.PlayerScores.Add(playerId, 0);
-                    returnValue = 1;
+                    game.PlayerAnswers.Add(game.numberOfPlayers, "");
+                    returnValue = game.numberOfPlayers;
                 }
                 return returnValue;
             }
@@ -690,10 +698,49 @@ namespace WitsClasses
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
             return game.GameLeader;
         }
+
+        
     }
 
-    public partial class PlayerManager: IChatManager
+    public partial class PlayerManager : IChatManager, IActiveGame
     {
+
+        private Dictionary<int, string> playerAnswers = new Dictionary<int, string>();
+        private Dictionary<int, PlayerSelectedAnswer> playerSelectedAnswers = new Dictionary<int, PlayerSelectedAnswer>();
+
+
+        public List<string> FilterPlayersByGame(Game game, int gameId)
+        {
+            List<string> playerIds = new List<string>();
+
+            foreach (string playerName in game.PlayerScores.Keys)
+            {
+                playerIds.Add(playerName);
+            }
+
+            return playerIds;
+        }
+
+        public void RegisterUserContext(string username)
+        {
+            if (!usersInLobbyContexts.ContainsKey(username))
+            {
+                IChatManagerCallback currentUserCallbackChannel = OperationContext.Current.GetCallbackChannel<IChatManagerCallback>();
+                usersInLobbyContexts.Add(username, currentUserCallbackChannel);
+            }
+        }
+
+        public void UnregisterUserContext(string username)
+        {
+            lock (usersInLobbyContexts)
+            {
+                if (usersInLobbyContexts.ContainsKey(username))
+                {
+                    usersInLobbyContexts.Remove(username);
+                }
+            }
+        }
+
         public void SendNewMessage(string message, int gameId)
         {
             OperationContext currentContext = OperationContext.Current;
@@ -706,18 +753,13 @@ namespace WitsClasses
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
             if (game != null)
             {
-                List<string> playerIds = new List<string>();
-
-                foreach (string playerName in game.PlayerScores.Keys)
-                {
-                    playerIds.Add(playerName);
-                }
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
 
                 foreach (string userInGame in playerIds)
                 {
                     try
                     {
-                        userContexts[userInGame].UpdateChat(message);
+                        usersInLobbyContexts[userInGame].UpdateChat(message);
                     }
                     catch (Exception ex)
                     {
@@ -727,5 +769,153 @@ namespace WitsClasses
             }
         }
 
+        //this 
+
+
+
+
+       
+
+        private List<int> GenerateRandomQuestionIds()
+        {
+            List<int> questionIds = new List<int>();
+            Random random = new Random();
+
+            // Generar 6 números aleatorios sin repetición
+            while (questionIds.Count < 6)
+            {
+                int newQuestionId = random.Next(1, 17); // El rango debe ser hasta 17 para incluir el 16
+                if (!questionIds.Contains(newQuestionId))
+                {
+                    questionIds.Add(newQuestionId);
+                }
+            }
+
+            return questionIds;
+        }
+
+        public List<int> GetQuestionIds(int gameId)
+        {
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            return game?.QuestionIds;
+        }
+
+        public void StartGame(int gameId)
+        {
+            OperationContext currentContext = OperationContext.Current;
+
+            if (currentContext == null)
+            {
+                return;
+            }
+
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                // Generar la lista de preguntas
+                List<int> questionIds = GenerateRandomQuestionIds();
+
+                // Asignar la lista al contexto del juego
+                game.QuestionIds = questionIds;
+
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
+
+                foreach (string userInGame in playerIds)
+                {
+                    try
+                    {
+                        usersInLobbyContexts[userInGame].StartGamePage();
+                    }
+                    catch (Exception ex)
+                    {
+                        witslogger.Error(ex);
+                    }
+                }
+            }
+        }
+
+        public void RegisterUserInGameContext(string username)
+        {
+            if (!usersInGameContexts.ContainsKey(username))
+            {
+                IActiveGameCallback currentUserCallbackChannel = OperationContext.Current.GetCallbackChannel<IActiveGameCallback>();
+                usersInGameContexts.Add(username, currentUserCallbackChannel);
+            }
+        }
+
+        public void UnregisterUserInGameContext(string username)
+        {
+            lock (usersInGameContexts)
+            {
+                if (usersInGameContexts.ContainsKey(username))
+                {
+                    usersInGameContexts.Remove(username);
+                }
+            }
+        }
+
+        public void SavePlayerAnswer(int playerNumber, string answer, int gameId)
+        {
+           
+
+            // Aquí puedes realizar cualquier lógica adicional antes de guardar la respuesta en el diccionario
+            playerAnswers[playerNumber] = answer;
+
+            // Puedes imprimir el diccionario en la consola si es necesario
+            Console.WriteLine("Player Answers:");
+            foreach (var kvp in playerAnswers)
+            {
+                Console.WriteLine($"Player {kvp.Key}: {kvp.Value}");
+            }
+
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
+
+                foreach (string userInGame in playerIds)
+                {
+                    try
+                    {
+                        usersInGameContexts[userInGame].UpdateAnswers(playerAnswers);
+                    }
+                    catch (Exception ex)
+                    {
+                        witslogger.Error(ex);
+                    }
+                }
+            }
+        }
+
+        public void ReceivePlayerSelectedAnswer(int playerNumber, int selectedAnswer, int idProfilePicture, int gameId)
+        {
+            playerSelectedAnswers[playerNumber] = new PlayerSelectedAnswer { SelectedAnswer = selectedAnswer, IdProfilePicture = idProfilePicture };
+
+            foreach (var kvp in playerSelectedAnswers)
+            {
+                Console.WriteLine($"Player {kvp.Key}: SelectedAnswer={kvp.Value.SelectedAnswer}, IdProfilePicture={kvp.Value.IdProfilePicture}");
+            }
+
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
+
+                foreach (string userInGame in playerIds)
+                {
+                    try
+                    {
+                        usersInGameContexts[userInGame].UpdateSelection(playerSelectedAnswers);
+                        Console.Write("YA LO MANDÓ RICKY");
+                    }
+                    catch (Exception ex)
+                    {
+                        witslogger.Error(ex);
+                        Console.WriteLine(ex);
+                    }
+                }
+            }
+        }
     }
 }
+
