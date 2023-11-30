@@ -23,9 +23,13 @@ namespace WitsClasses.Contracts
         [OperationContract(IsOneWay = true)]
         void ReceivePlayerSelectedAnswer(int playerNumber, int selectedAnswer,int idProfilePicture, int gameId);
 
-      
+        [OperationContract(IsOneWay = true)]
+         void ReadyToWager(int gameId, int playerNumber, bool isReady);
 
-        
+        [OperationContract(IsOneWay = true)]
+        void ReadyToShowAnswer(int gameId, int playerNumber, bool isReady);
+
+
 
     }
 
@@ -37,6 +41,12 @@ namespace WitsClasses.Contracts
 
         [OperationContract]
         void UpdateSelection(Dictionary<int, PlayerSelectedAnswer> playerSelectedAnswers);
+
+        [OperationContract]
+        void ShowEnterWager();
+
+        [OperationContract]
+        void ShowTrueAnswer();
     }
 
     public class PlayerSelectedAnswer

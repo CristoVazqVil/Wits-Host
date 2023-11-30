@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using WitsClasses.Contracts;
 using System.Windows;
 using System.Runtime.Remoting.Messaging;
+using System.Security.Cryptography;
 
 
 namespace WitsClasses
@@ -699,7 +700,7 @@ namespace WitsClasses
             return game.GameLeader;
         }
 
-        
+
     }
 
     public partial class PlayerManager : IChatManager, IActiveGame
@@ -769,12 +770,14 @@ namespace WitsClasses
             }
         }
 
+
+
         //this 
 
 
 
 
-       
+
 
         private List<int> GenerateRandomQuestionIds()
         {
@@ -856,7 +859,7 @@ namespace WitsClasses
 
         public void SavePlayerAnswer(int playerNumber, string answer, int gameId)
         {
-           
+
 
             // Aquí puedes realizar cualquier lógica adicional antes de guardar la respuesta en el diccionario
             playerAnswers[playerNumber] = answer;
@@ -906,7 +909,6 @@ namespace WitsClasses
                     try
                     {
                         usersInGameContexts[userInGame].UpdateSelection(playerSelectedAnswers);
-                        Console.Write("YA LO MANDÓ RICKY");
                     }
                     catch (Exception ex)
                     {
@@ -916,6 +918,72 @@ namespace WitsClasses
                 }
             }
         }
-    }
-}
 
+        public void ReadyToWager(int gameId, int playerNumber, bool isReady)
+        {
+            OperationContext currentContext = OperationContext.Current;
+
+            if (currentContext == null)
+            {
+                return;
+            }
+
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
+
+                foreach (string userInGame in playerIds)
+                {
+                    // Crea o actualiza la entrada del jugador en el diccionario de listo/no listo
+                    game.PlayerReadyToWagerStatus[playerNumber] = isReady;
+
+
+                    Console.WriteLine($" JUGADORES: Player {playerNumber}: Ready Status = {isReady}");
+                    // Verifica si todos los jugadores están listos
+                    bool allPlayersReady = game.PlayerReadyToWagerStatus.All(pair => pair.Value);
+
+                    if (allPlayersReady)
+                    {
+                        usersInGameContexts[userInGame].ShowEnterWager();
+                    }
+                }
+            }
+        }
+
+
+
+        public void ReadyToShowAnswer(int gameId, int playerNumber, bool isReady)
+        {
+            OperationContext currentContext = OperationContext.Current;
+
+            if (currentContext == null)
+            {
+                return;
+            }
+
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
+
+                foreach (string userInGame in playerIds)
+                {
+                    // Crea o actualiza la entrada del jugador en el diccionario de listo/no listo
+                    game.PlayerHasWageredStatus[playerNumber] = isReady;
+
+
+                    Console.WriteLine($" JUGADORES: Player {playerNumber}: Ready Status = {isReady}");
+                    // Verifica si todos los jugadores están listos
+                    bool allPlayersReady = game.PlayerHasWageredStatus.All(pair => pair.Value);
+
+                    if (allPlayersReady)
+                    {
+                        usersInGameContexts[userInGame].ShowTrueAnswer();
+                    }
+                }
+            }
+        }
+    }
+
+}
