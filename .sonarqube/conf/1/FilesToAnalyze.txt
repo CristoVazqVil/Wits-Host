@@ -1,0 +1,5 @@
+﻿D:\UV\Tecnologias\WitsHost\Program.cs
+D:\UV\Tecnologias\WitsHost\Properties\AssemblyInfo.cs
+D:\UV\Tecnologias\WitsHost\App.config
+D:\UV\Tecnologias\WitsHost\Log4Net.config
+D:\UV\Tecnologias\WitsHost\packages.config

@@ -3,20 +3,26 @@ using System.ServiceModel;
 
 namespace WitsClasses.Contracts
 {
-    [ServiceContract]
+    [ServiceContract(CallbackContract = typeof(IConnectedUsersCallback))]
     public interface IConnectedUsers
     {
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void AddConnectedUser(string username);
 
-        [OperationContract]
-        List<string> GetConnectedUsers();
+        [OperationContract(IsOneWay = true)]
+        void RemoveConnectedUserInMenu(string username);
 
-        
-        [OperationContract]
+        [OperationContract(IsOneWay = true)]
         void RemoveConnectedUser(string username);
 
         [OperationContract]
-        List<string> GetConnectedFriends(string principalPlayer, List<string> allConnectedUsers);
+        List<string> GetConnectedFriends(string principalPlayer);
+    }
+
+    [ServiceContract]
+    public interface IConnectedUsersCallback
+    {
+        [OperationContract]
+        void UpdateConnectedFriends();
     }
 }

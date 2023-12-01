@@ -16,10 +16,19 @@ namespace WitsClasses.Contracts
         int AddPlayer(Player player);
 
         [OperationContract]
+        int DeletePlayer(string username);
+
+        [OperationContract]
+        bool IsPlayerLogged(string username);
+
+        [OperationContract]
         Player GetPlayerByUser(String username);
 
         [OperationContract]
         Player GetPlayerByUserAndPassword(String username, String userPassword);
+
+        [OperationContract]
+        int UpdatePassword(string username, string password);
 
         [OperationContract]
         List<string> GetPlayerFriends(string playerUsername);

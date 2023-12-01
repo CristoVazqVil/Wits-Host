@@ -12,7 +12,7 @@ namespace WitsClasses.Contracts
     public interface IGameManager
     {
         [OperationContract]
-        void CreateGame(int gameId, string gameLeader, int numberOfPlayers);
+        void CreateGame(int gameId, string gameLeader);
 
         [OperationContract]
         int JoinGame(int gameId, string playerId);
@@ -40,6 +40,8 @@ namespace WitsClasses.Contracts
         public string gameLeader;
         public int numberOfPlayers;
         public Dictionary<string, int> playerScores;
+        public List<int> questionIds;
+        public Dictionary<int, string> playerAnswers;
 
         [DataMember]
         public int GameId { get { return gameId; } set { gameId = value; } }
@@ -53,12 +55,21 @@ namespace WitsClasses.Contracts
         [DataMember]
         public Dictionary<string, int> PlayerScores { get { return playerScores; } set { playerScores = value; } }
 
+        [DataMember]
+        public Dictionary<int, string> PlayerAnswers { get { return playerAnswers; } set { playerAnswers = value; } }
+
+
+        [DataMember]
+        public List<int> QuestionIds { get { return questionIds; } set { questionIds = value; } }
+
         public Game(int gameId, string gameLeader, int numberOfPlayers)
         {
             GameId = gameId;
             GameLeader = gameLeader;
             NumberOfPlayers = numberOfPlayers;
             PlayerScores = new Dictionary<string, int>();
+            PlayerAnswers = new Dictionary<int, string>();
+            QuestionIds = new List<int>();
         }
     }
 

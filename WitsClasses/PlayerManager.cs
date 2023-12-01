@@ -15,15 +15,16 @@ using WitsClasses.Contracts;
 namespace WitsClasses
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    public partial class PlayerManager : IPlayerManager, IConnectedUsers, IGameManager, IChatManager
+    public partial class PlayerManager : IPlayerManager, IConnectedUsers, IGameManager
     {
         private const int PENDING = 0;
         private const int ACCEPTED = 1;
         private const int REJECTED = 2;
         private static readonly ILog witslogger = LogManager.GetLogger(typeof(PlayerManager));
-        private Dictionary<string, IChatManagerCallback> userContexts = new Dictionary<string, IChatManagerCallback>();
+        private Dictionary<string, IConnectedUsersCallback> connectedUsersInMenu = new Dictionary<string, IConnectedUsersCallback>();
+        private Dictionary<string, IChatManagerCallback> usersInLobbyContexts = new Dictionary<string, IChatManagerCallback>();
+        private List<string> allConnectedUsers = new List<string>();
         private static PlayerManager instance;
-        private List<string> connectedUsers = new List<string>();
         private List<Game> games = new List<Game>();
 
         private PlayerManager()
@@ -70,22 +71,136 @@ namespace WitsClasses
             return affectedTables;
         }
 
-        public List<string> GetConnectedUsers()
+        public int DeletePlayer(string username)
         {
-            return connectedUsers;
+            int affectedRows = 0;
+
+            using (var context = new WitsAndWagersEntities())
+            {
+                try
+                {
+                    var playerToDelete = context.Players.FirstOrDefault(p => p.username == username);
+
+                    if (playerToDelete != null)
+                    {
+                        context.Players.Remove(playerToDelete);
+                        affectedRows = context.SaveChanges();
+                    }
+                    else
+                    {
+                        affectedRows = 0;
+                    }
+                }
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedRows = 0;
+                    return affectedRows;
+                }
+            }
+
+            return affectedRows;
+
+        }
+
+        public bool IsPlayerLogged(string username)
+        {
+            return allConnectedUsers.Contains(username);
+        }
+
+        public int UpdatePassword(string username, string password)
+        {
+            int affectedTables = 0;
+
+            using (var context = new WitsAndWagersEntities())
+            {
+                try
+                {
+                    var playerToUpdate = context.Players
+                        .FirstOrDefault(p => p.username == username);
+
+                    if (playerToUpdate != null)
+                    {
+                        playerToUpdate.userPassword = password;
+                        affectedTables = context.SaveChanges();
+                    }
+                    else
+                    {
+                        affectedTables = 0;
+                    }
+                }
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
+                    return affectedTables;
+                }
+            }
+
+            return affectedTables;
         }
 
         public void AddConnectedUser(string username)
         {
-            if (!connectedUsers.Contains(username))
+            if (!connectedUsersInMenu.ContainsKey(username))
             {
-                connectedUsers.Add(username);
+                IConnectedUsersCallback currentUserCallbackChannel = OperationContext.Current.GetCallbackChannel<IConnectedUsersCallback>();
+                connectedUsersInMenu.Add(username, currentUserCallbackChannel);
+                connectedUsersInMenu[username].UpdateConnectedFriends();
+            }
 
-                Console.WriteLine("CONNECTED USERS:");
-                foreach (string user in connectedUsers)
+            if (!allConnectedUsers.Contains(username))
+            {
+                allConnectedUsers.Add(username);
+
+                try
                 {
-                    Console.WriteLine(user);
+                    foreach (string connectedUser in allConnectedUsers)
+                    {
+                        connectedUsersInMenu[connectedUser].UpdateConnectedFriends();
+                    }
+
                 }
+                catch (Exception ex)
+                {
+                    witslogger.Error(ex);
+                }
+            }
+        }
+
+        public void RemoveConnectedUserInMenu(string username)
+        {
+            lock (connectedUsersInMenu)
+            {
+                if (connectedUsersInMenu.ContainsKey(username))
+                {
+                    connectedUsersInMenu.Remove(username);
+                }
+            }
+        }
+
+        public void RemoveConnectedUser(string username)
+        {
+            allConnectedUsers.Remove(username);
+            lock (connectedUsersInMenu)
+            {
+                if (connectedUsersInMenu.ContainsKey(username))
+                {
+                    connectedUsersInMenu.Remove(username);
+                }
+            }
+
+            try
+            {
+                foreach (string connectedUser in allConnectedUsers)
+                {
+                    connectedUsersInMenu[connectedUser].UpdateConnectedFriends();
+                }
+
+            }
+            catch (Exception ex)
+            {
+                witslogger.Error(ex);
             }
         }
 
@@ -146,8 +261,6 @@ namespace WitsClasses
                             profilePictureId = (int)player.profilePictureId,
                             celebrationId = (int)player.celebrationId
                         };
-
-                        AddConnectedUser(username);
 
                         return foundPlayer;
                     }
@@ -550,33 +663,6 @@ namespace WitsClasses
             return false;
         }
 
-
-        public void RemoveConnectedUser(string username)
-        {
-            connectedUsers.Remove(username);
-        }
-
-        public void RegisterUserContext(string username)
-        {
-            if (!userContexts.ContainsKey(username))
-            {
-                IChatManagerCallback currentUserCallbackChannel = OperationContext.Current.GetCallbackChannel<IChatManagerCallback>();
-                userContexts.Add(username, currentUserCallbackChannel);
-            }
-        }
-
-        public void UnregisterUserContext(string username)
-        {
-            lock (userContexts)
-            {
-                if (userContexts.ContainsKey(username))
-                {
-                    userContexts.Remove(username);
-                }
-            }
-        }
-
-
         public Question GetQuestionByID(int questionId)
         {
             using (var context = new WitsAndWagersEntities())
@@ -605,9 +691,9 @@ namespace WitsClasses
             }
         }
 
-        public List<string> GetConnectedFriends(string principalPlayer, List<string> allConnectedUsers)
+        public List<string> GetConnectedFriends(string principalPlayer)
         {
-            List<string> connectedFirends = new List<string>();
+            List<string> connectedFriends = new List<string>();
 
             using (var context = new WitsAndWagersEntities())
             {
@@ -619,11 +705,11 @@ namespace WitsClasses
                         var friendship = context.Friends.FirstOrDefault(p => p.principalPlayer == principalPlayer && p.friend == friend);
                         if (friendship != null)
                         {
-                            connectedFirends.Add(friend);
+                            connectedFriends.Add(friend);
                         }
                     }
 
-                    return connectedFirends;
+                    return connectedFriends;
                 }
                 catch (SqlException ex)
                 {
@@ -633,15 +719,17 @@ namespace WitsClasses
             }
         }
 
-        public void CreateGame(int gameId, string gameLeader, int numberOfPlayers)
+        public void CreateGame(int gameId, string gameLeader)
         {
             if (games.Any(g => g.GameId == gameId))
             {
                 throw new ApplicationException("Used ID");
             }
 
-            var newGame = new Game(gameId, gameLeader, numberOfPlayers);
+            var newGame = new Game(gameId, gameLeader, 1);
             newGame.PlayerScores.Add(gameLeader, 0);
+            newGame.PlayerAnswers.Add(newGame.numberOfPlayers, "");
+
             games.Add(newGame);
         }
 
@@ -653,8 +741,13 @@ namespace WitsClasses
             {
                 if (!game.PlayerScores.ContainsKey(playerId))
                 {
-                    game.PlayerScores.Add(playerId, 0);
-                    returnValue = 1;
+                    if (game.numberOfPlayers < 4)
+                    {
+                        game.numberOfPlayers = game.numberOfPlayers + 1;
+                        game.PlayerScores.Add(playerId, 0);
+                        game.PlayerAnswers.Add(game.numberOfPlayers, "");
+                        returnValue = game.numberOfPlayers;
+                    }
                 }
                 return returnValue;
             }
@@ -690,10 +783,44 @@ namespace WitsClasses
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
             return game.GameLeader;
         }
+
+        
     }
 
-    public partial class PlayerManager: IChatManager
+    public partial class PlayerManager : IChatManager
     {
+        public List<string> FilterPlayersByGame(Game game, int gameId)
+        {
+            List<string> playerIds = new List<string>();
+
+            foreach (string playerName in game.PlayerScores.Keys)
+            {
+                playerIds.Add(playerName);
+            }
+
+            return playerIds;
+        }
+
+        public void RegisterUserContext(string username)
+        {
+            if (!usersInLobbyContexts.ContainsKey(username))
+            {
+                IChatManagerCallback currentUserCallbackChannel = OperationContext.Current.GetCallbackChannel<IChatManagerCallback>();
+                usersInLobbyContexts.Add(username, currentUserCallbackChannel);
+            }
+        }
+
+        public void UnregisterUserContext(string username)
+        {
+            lock (usersInLobbyContexts)
+            {
+                if (usersInLobbyContexts.ContainsKey(username))
+                {
+                    usersInLobbyContexts.Remove(username);
+                }
+            }
+        }
+
         public void SendNewMessage(string message, int gameId)
         {
             OperationContext currentContext = OperationContext.Current;
@@ -706,24 +833,49 @@ namespace WitsClasses
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
             if (game != null)
             {
-                List<string> playerIds = new List<string>();
-
-                foreach (string playerName in game.PlayerScores.Keys)
-                {
-                    playerIds.Add(playerName);
-                }
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
 
                 foreach (string userInGame in playerIds)
                 {
                     try
                     {
-                        userContexts[userInGame].UpdateChat(message);
+                        usersInLobbyContexts[userInGame].UpdateChat(message);
                     }
                     catch (Exception ex)
                     {
                         witslogger.Error(ex);
                     }
                 }
+            }
+        }
+
+        public void StartGame(int gameId)
+        {
+            OperationContext currentContext = OperationContext.Current;
+
+            if (currentContext == null)
+            {
+                return;
+            }
+
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
+
+                foreach (string userInGame in playerIds)
+                {
+                    try
+                    {
+                        usersInLobbyContexts[userInGame].StartGamePage();
+                    }
+                    catch (Exception ex)
+                    {
+                        witslogger.Error(ex);
+                    }
+
+                }
+
             }
         }
 
