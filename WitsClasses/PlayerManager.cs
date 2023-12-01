@@ -984,6 +984,43 @@ namespace WitsClasses
                 }
             }
         }
+
+        public void WhoWon(int gameId, int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture)
+        {
+
+            OperationContext currentContext = OperationContext.Current;
+
+            if (currentContext == null)
+            {
+                return;
+            }
+
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
+
+                foreach (string userInGame in playerIds)
+                {
+
+                    Dictionary<string, object> winnerInfo = new Dictionary<string, object>
+            {
+                { "NumberPlayer", numberPlayer },
+                { "UserName", userName },
+                { "IdCelebration", idCelebration },
+                { "Score", score },
+                { "IdProfilePicture", idProfilePicture }
+            };
+
+                    Console.WriteLine("Winner Information:");
+                    foreach (var kvp in winnerInfo)
+                    {
+                        Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                    }
+                }
+            }
+
+        }
     }
 
 }

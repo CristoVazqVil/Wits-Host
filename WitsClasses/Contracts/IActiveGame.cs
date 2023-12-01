@@ -29,6 +29,8 @@ namespace WitsClasses.Contracts
         [OperationContract(IsOneWay = true)]
         void ReadyToShowAnswer(int gameId, int playerNumber, bool isReady);
 
+        [OperationContract(IsOneWay = true)]
+        void WhoWon(int gameId,int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture);
 
 
     }
