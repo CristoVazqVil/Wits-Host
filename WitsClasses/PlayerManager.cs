@@ -28,7 +28,6 @@ namespace WitsClasses
         private Dictionary<string, IConnectedUsersCallback> connectedUsersInMenu = new Dictionary<string, IConnectedUsersCallback>();
         private Dictionary<string, IChatManagerCallback> usersInLobbyContexts = new Dictionary<string, IChatManagerCallback>();
         private List<string> allConnectedUsers = new List<string>();
-        private Dictionary<string, IChatManagerCallback> usersInLobbyContexts = new Dictionary<string, IChatManagerCallback>();
         private Dictionary<string, IActiveGameCallback> usersInGameContexts = new Dictionary<string, IActiveGameCallback>();
         private static PlayerManager instance;
         private List<Game> games = new List<Game>();
@@ -674,10 +673,7 @@ namespace WitsClasses
         }
 
 
-        public void RemoveConnectedUser(string username)
-        {
-            connectedUsers.Remove(username);
-        }
+   
 
         public int GetRandomQuestionId()
         {

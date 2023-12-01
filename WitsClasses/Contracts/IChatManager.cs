@@ -22,8 +22,7 @@ namespace WitsClasses.Contracts
         [OperationContract(IsOneWay = true)]
         void UnregisterUserContext(string username);
 
-        [OperationContract(IsOneWay = true)]
-        void StartGame(int gameId);
+      
 
     }
 
