@@ -31,6 +31,16 @@ namespace WitsClasses.Contracts
 
         [OperationContract]
         Question GetQuestionByID(int questionId);
+
+        [OperationContract]
+        int GetRandomQuestionId();
+
+        [OperationContract]
+        List<int> GetQuestionIds(int gameId);
+
+     
+
+
     }
 
     [DataContract]
@@ -55,8 +65,16 @@ namespace WitsClasses.Contracts
         [DataMember]
         public Dictionary<string, int> PlayerScores { get { return playerScores; } set { playerScores = value; } }
 
+
         [DataMember]
-        public Dictionary<int, string> PlayerAnswers { get { return playerAnswers; } set { playerAnswers = value; } }
+        public Dictionary<int, bool> PlayerReadyToWagerStatus { get; set; } = new Dictionary<int, bool>();
+
+        [DataMember]
+        public Dictionary<int, bool> PlayerHasWageredStatus { get; set; } = new Dictionary<int, bool>();
+
+
+        [DataMember]
+        public Dictionary<int, string> PlayerAnswers{ get { return playerAnswers; } set { playerAnswers = value; } }
 
 
         [DataMember]

@@ -66,6 +66,7 @@
     <Compile Include="Celebrations.cs">
       <DependentUpon>WitsDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Contracts\IActiveGame.cs" />
     <Compile Include="Contracts\IChatManager.cs" />
     <Compile Include="Contracts\IConnectedUsers.cs" />
     <Compile Include="Contracts\IGameManager.cs" />
