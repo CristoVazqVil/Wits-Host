@@ -30,8 +30,14 @@ namespace WitsClasses.Contracts
         void ReadyToShowAnswer(int gameId, int playerNumber, bool isReady);
 
         [OperationContract(IsOneWay = true)]
+        void GameEnded(int gameId, int playerNumber, bool isRegistered);
+
+        [OperationContract(IsOneWay = true)]
         void WhoWon(int gameId,int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture);
 
+
+        [OperationContract(IsOneWay = true)]
+        void ShowWinner(int gameId);
 
     }
 
@@ -49,12 +55,13 @@ namespace WitsClasses.Contracts
 
         [OperationContract]
         void ShowTrueAnswer();
+
+        [OperationContract]
+        void ShowVictoryScreen(string userName, int profilePictureId, int celebrationId, int score);
     }
 
     public class PlayerSelectedAnswer
     {
-        
-
         [DataMember]
         public int SelectedAnswer { get; set; }
 

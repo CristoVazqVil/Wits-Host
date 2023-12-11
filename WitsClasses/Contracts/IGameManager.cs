@@ -72,6 +72,10 @@ namespace WitsClasses.Contracts
         [DataMember]
         public Dictionary<int, bool> PlayerHasWageredStatus { get; set; } = new Dictionary<int, bool>();
 
+        [DataMember]
+        public Dictionary<int, bool> PlayerEnded { get; set; } = new Dictionary<int, bool>();
+
+       
 
         [DataMember]
         public Dictionary<int, string> PlayerAnswers{ get { return playerAnswers; } set { playerAnswers = value; } }
