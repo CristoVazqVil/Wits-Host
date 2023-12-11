@@ -847,7 +847,7 @@ namespace WitsClasses
 
         private Dictionary<int, string> playerAnswers = new Dictionary<int, string>();
         private Dictionary<int, PlayerSelectedAnswer> playerSelectedAnswers = new Dictionary<int, PlayerSelectedAnswer>();
-
+        private Dictionary<string, object> PlayersFinalScores = new Dictionary<string, object>();
 
         public List<string> FilterPlayersByGame(Game game, int gameId)
         {
@@ -1025,11 +1025,7 @@ namespace WitsClasses
             playerAnswers[playerNumber] = answer;
 
             // Puedes imprimir el diccionario en la consola si es necesario
-            Console.WriteLine("Player Answers:");
-            foreach (var kvp in playerAnswers)
-            {
-                Console.WriteLine($"Player {kvp.Key}: {kvp.Value}");
-            }
+          
 
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
             if (game != null)
@@ -1053,11 +1049,6 @@ namespace WitsClasses
         public void ReceivePlayerSelectedAnswer(int playerNumber, int selectedAnswer, int idProfilePicture, int gameId)
         {
             playerSelectedAnswers[playerNumber] = new PlayerSelectedAnswer { SelectedAnswer = selectedAnswer, IdProfilePicture = idProfilePicture };
-
-            foreach (var kvp in playerSelectedAnswers)
-            {
-                Console.WriteLine($"Player {kvp.Key}: SelectedAnswer={kvp.Value.SelectedAnswer}, IdProfilePicture={kvp.Value.IdProfilePicture}");
-            }
 
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
             if (game != null)
@@ -1155,9 +1146,114 @@ namespace WitsClasses
             }
         }
 
+
+
+
+
+
         public void WhoWon(int gameId, int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture)
         {
+            Dictionary<string, object> playerInfo = new Dictionary<string, object>
+        {
+            { "NumberPlayer", numberPlayer },
+            { "UserName", userName },
+            { "IdCelebration", idCelebration },
+            { "Score", score },
+            { "IdProfilePicture", idProfilePicture }
+        };
 
+            PlayersFinalScores.Add($"Player{numberPlayer}", playerInfo);
+        }
+
+
+        public void ShowWinner(int gameId)
+        {
+            OperationContext currentContext = OperationContext.Current;
+
+            if (currentContext == null)
+            {
+                return;
+            }
+
+            int maxScore = int.MinValue;
+            List<Dictionary<string, object>> winnersInfo = new List<Dictionary<string, object>>();
+
+            foreach (var playerInfo in PlayersFinalScores.Values)
+            {
+                int score = (int)((Dictionary<string, object>)playerInfo)["Score"];
+
+                if (score > maxScore)
+                {
+                    maxScore = score;
+                    winnersInfo.Clear();
+                    winnersInfo.Add((Dictionary<string, object>)playerInfo);
+                }
+                else if (score == maxScore)
+                {
+                    winnersInfo.Add((Dictionary<string, object>)playerInfo);
+                }
+            }
+
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+
+            if (game != null)
+            {
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
+
+                foreach (string userInGame in playerIds)
+                {
+                    try
+                    {
+
+                        if (winnersInfo.Count > 1)
+                        {
+                            Console.WriteLine("Hubo un empate:");
+                            usersInGameContexts[userInGame].TieBreaker();
+                        }
+                        else
+                        {
+                            Console.WriteLine("Ganador:");
+                        }
+
+              
+                        if (winnersInfo.Count  < 2)
+                        {
+                            Console.WriteLine("ACTUAL Winner Information:");
+                            foreach (var winnerInfo in winnersInfo)
+                            {
+                                foreach (var kvp in winnerInfo)
+                                {
+                                    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                                }
+                                Console.WriteLine();
+                            }
+
+                            usersInGameContexts[userInGame].ShowVictoryScreen(
+                                (string)winnersInfo[0]["UserName"],
+                                (int)winnersInfo[0]["IdProfilePicture"],
+                                (int)winnersInfo[0]["IdCelebration"],
+                                (int)winnersInfo[0]["Score"]
+                            );
+                        }
+                        else
+                        {
+                            Console.WriteLine("No winner information available.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        witslogger.Error(ex);
+                    }
+                }
+            }
+        }
+
+
+
+
+
+        public void GameEnded(int gameId, int playerNumber, bool isRegistered)
+        {
             OperationContext currentContext = OperationContext.Current;
 
             if (currentContext == null)
@@ -1172,25 +1268,58 @@ namespace WitsClasses
 
                 foreach (string userInGame in playerIds)
                 {
+                    // Crea o actualiza la entrada del jugador en el diccionario de listo/no listo
+                    game.PlayerEnded[playerNumber] = isRegistered;
 
-                    Dictionary<string, object> winnerInfo = new Dictionary<string, object>
-            {
-                { "NumberPlayer", numberPlayer },
-                { "UserName", userName },
-                { "IdCelebration", idCelebration },
-                { "Score", score },
-                { "IdProfilePicture", idProfilePicture }
-            };
 
-                    Console.WriteLine("Winner Information:");
-                    foreach (var kvp in winnerInfo)
+                    Console.WriteLine($" JUGADORES: Player {playerNumber}: Ended Status = {isRegistered}");
+                    // Verifica si todos los jugadores están listos
+                    bool allPlayersReady = game.PlayerEnded.All(pair => pair.Value);
+
+                    if (allPlayersReady)
                     {
-                        Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                        
+                        ShowWinner(gameId);
                     }
                 }
             }
 
+
+        }
+
+        public void CleanWinners(int gameId)
+        {
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
+
+                foreach (string userInGame in playerIds)
+                {
+                    try
+                    {
+
+                        PlayersFinalScores.Clear();
+                    }
+                    catch (Exception ex)
+                    {
+                        witslogger.Error(ex);
+                    }
+                }
+            }
+
+            
         }
     }
 
+    
+       /*
+        * El problema está en que busca la respuesta cada vez que se llama, si llama un solo jugador el diccionario 
+        * tiene un solo jugador
+        * 
+        * debo de crear el diccionario y después llamo al GameEnded y cuando el gameEnded junte a todos los jugadores
+        * Entonces ya busca la respuesta de quién tiene más puntos en el diccionario.
+        * 
+       */
 }
+       
