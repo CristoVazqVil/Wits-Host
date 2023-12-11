@@ -39,6 +39,10 @@ namespace WitsClasses.Contracts
         [OperationContract(IsOneWay = true)]
         void ShowWinner(int gameId);
 
+
+        [OperationContract(IsOneWay = true)]
+        void CleanWinners(int gameId);
+
     }
 
     [ServiceContract]
@@ -58,6 +62,10 @@ namespace WitsClasses.Contracts
 
         [OperationContract]
         void ShowVictoryScreen(string userName, int profilePictureId, int celebrationId, int score);
+
+        [OperationContract]
+        void TieBreaker();
+
     }
 
     public class PlayerSelectedAnswer

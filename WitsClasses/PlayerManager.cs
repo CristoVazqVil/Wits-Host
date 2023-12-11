@@ -978,11 +978,7 @@ namespace WitsClasses
             playerAnswers[playerNumber] = answer;
 
             // Puedes imprimir el diccionario en la consola si es necesario
-            Console.WriteLine("Player Answers:");
-            foreach (var kvp in playerAnswers)
-            {
-                Console.WriteLine($"Player {kvp.Key}: {kvp.Value}");
-            }
+          
 
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
             if (game != null)
@@ -1122,9 +1118,8 @@ namespace WitsClasses
                 return;
             }
 
-
             int maxScore = int.MinValue;
-            Dictionary<string, object> winnerInfo = null;
+            List<Dictionary<string, object>> winnersInfo = new List<Dictionary<string, object>>();
 
             foreach (var playerInfo in PlayersFinalScores.Values)
             {
@@ -1133,12 +1128,17 @@ namespace WitsClasses
                 if (score > maxScore)
                 {
                     maxScore = score;
-                    winnerInfo = (Dictionary<string, object>)playerInfo;
+                    winnersInfo.Clear();
+                    winnersInfo.Add((Dictionary<string, object>)playerInfo);
+                }
+                else if (score == maxScore)
+                {
+                    winnersInfo.Add((Dictionary<string, object>)playerInfo);
                 }
             }
 
-
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
+
             if (game != null)
             {
                 List<string> playerIds = FilterPlayersByGame(game, gameId);
@@ -1147,21 +1147,36 @@ namespace WitsClasses
                 {
                     try
                     {
-                        if (winnerInfo != null)
+
+                        if (winnersInfo.Count > 1)
+                        {
+                            Console.WriteLine("Hubo un empate:");
+                            usersInGameContexts[userInGame].TieBreaker();
+                        }
+                        else
+                        {
+                            Console.WriteLine("Ganador:");
+                        }
+
+              
+                        if (winnersInfo.Count  < 2)
                         {
                             Console.WriteLine("ACTUAL Winner Information:");
-                            foreach (var kvp in winnerInfo)
+                            foreach (var winnerInfo in winnersInfo)
                             {
-                                Console.WriteLine($"{kvp.Key}: {kvp.Value}");
-
+                                foreach (var kvp in winnerInfo)
+                                {
+                                    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                                }
+                                Console.WriteLine();
                             }
 
                             usersInGameContexts[userInGame].ShowVictoryScreen(
-                            (string)winnerInfo["UserName"],
-                            (int)winnerInfo["IdProfilePicture"],
-                            (int)winnerInfo["IdCelebration"],
-                            (int)winnerInfo["Score"]
-                             );
+                                (string)winnersInfo[0]["UserName"],
+                                (int)winnersInfo[0]["IdProfilePicture"],
+                                (int)winnersInfo[0]["IdCelebration"],
+                                (int)winnersInfo[0]["Score"]
+                            );
                         }
                         else
                         {
@@ -1174,8 +1189,8 @@ namespace WitsClasses
                     }
                 }
             }
-           
         }
+
 
 
 
@@ -1213,6 +1228,30 @@ namespace WitsClasses
             }
 
 
+        }
+
+        public void CleanWinners(int gameId)
+        {
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
+
+                foreach (string userInGame in playerIds)
+                {
+                    try
+                    {
+
+                        PlayersFinalScores.Clear();
+                    }
+                    catch (Exception ex)
+                    {
+                        witslogger.Error(ex);
+                    }
+                }
+            }
+
+            
         }
     }
 
