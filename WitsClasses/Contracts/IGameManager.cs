@@ -18,7 +18,13 @@ namespace WitsClasses.Contracts
         int JoinGame(int gameId, string playerId);
 
         [OperationContract]
+        int RemovePlayerInGame(int gameId, string playerId);
+
+        [OperationContract]
         Dictionary<string, int> GetScores(int gameId);
+
+        [OperationContract]
+        List<string> GetPlayersOfGameExceptLeader(int gameId, string leaderUser);
 
         [OperationContract]
         void ModifyScore(int gameId, string playerId, int credits);
@@ -37,10 +43,6 @@ namespace WitsClasses.Contracts
 
         [OperationContract]
         List<int> GetQuestionIds(int gameId);
-
-     
-
-
     }
 
     [DataContract]

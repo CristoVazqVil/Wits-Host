@@ -18,13 +18,16 @@ namespace WitsClasses.Contracts
         void UnregisterUserInGameContext(string username);
 
         [OperationContract(IsOneWay = true)]
+        void ExpelPlayer(string username);
+
+        [OperationContract(IsOneWay = true)]
         void SavePlayerAnswer(int playerNumber, string answer, int gameId);
 
         [OperationContract(IsOneWay = true)]
         void ReceivePlayerSelectedAnswer(int playerNumber, int selectedAnswer,int idProfilePicture, int gameId);
 
         [OperationContract(IsOneWay = true)]
-         void ReadyToWager(int gameId, int playerNumber, bool isReady);
+        void ReadyToWager(int gameId, int playerNumber, bool isReady);
 
         [OperationContract(IsOneWay = true)]
         void ReadyToShowAnswer(int gameId, int playerNumber, bool isReady);
@@ -49,12 +52,13 @@ namespace WitsClasses.Contracts
 
         [OperationContract]
         void ShowTrueAnswer();
+
+        [OperationContract]
+        void BeExpelled();
     }
 
     public class PlayerSelectedAnswer
     {
-        
-
         [DataMember]
         public int SelectedAnswer { get; set; }
 

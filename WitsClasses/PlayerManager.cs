@@ -24,12 +24,13 @@ namespace WitsClasses
         private const int PENDING = 0;
         private const int ACCEPTED = 1;
         private const int REJECTED = 2;
+        private static PlayerManager instance;
         private static readonly ILog witslogger = LogManager.GetLogger(typeof(PlayerManager));
         private Dictionary<string, IConnectedUsersCallback> connectedUsersInMenu = new Dictionary<string, IConnectedUsersCallback>();
         private Dictionary<string, IChatManagerCallback> usersInLobbyContexts = new Dictionary<string, IChatManagerCallback>();
-        private List<string> allConnectedUsers = new List<string>();
+        private Dictionary<string, int> playersnumbers = new Dictionary<string, int>();
         private Dictionary<string, IActiveGameCallback> usersInGameContexts = new Dictionary<string, IActiveGameCallback>();
-        private static PlayerManager instance;
+        private List<string> allConnectedUsers = new List<string>();
         private List<Game> games = new List<Game>();
         private List<int> usedQuestionIds = new List<int>();
         private Random random = new Random();
@@ -758,6 +759,7 @@ namespace WitsClasses
             var newGame = new Game(gameId, gameLeader, 1);
             newGame.PlayerScores.Add(gameLeader, 0);
             newGame.PlayerAnswers.Add(newGame.numberOfPlayers, "");
+            playersnumbers.Add(gameLeader, newGame.numberOfPlayers);
 
             games.Add(newGame);
         }
@@ -765,7 +767,7 @@ namespace WitsClasses
         public int JoinGame(int gameId, string playerId)
         {
             int returnValue = 0;
-            var game = games.FirstOrDefault(g => g.GameId == gameId);
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
             if (game != null)
             {
                 if (!game.PlayerScores.ContainsKey(playerId))
@@ -775,6 +777,7 @@ namespace WitsClasses
                         game.numberOfPlayers = game.numberOfPlayers + 1;
                         game.PlayerScores.Add(playerId, 0);
                         game.PlayerAnswers.Add(game.numberOfPlayers, "");
+                        playersnumbers.Add(playerId, game.numberOfPlayers);
                         returnValue = game.numberOfPlayers;
                     }
                 }
@@ -784,6 +787,29 @@ namespace WitsClasses
             {
                 return returnValue;
             }
+        }
+
+        public int RemovePlayerInGame(int gameId, string playerId)
+        {
+            int returnValue = 0;
+
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                if (game.PlayerScores.ContainsKey(playerId))
+                {
+                    game.PlayerScores.Remove(playerId);
+                    game.numberOfPlayers = game.numberOfPlayers - 1;
+                    game.PlayerReadyToWagerStatus.Remove(playersnumbers[playerId]);
+                    game.PlayerAnswers.Remove(playersnumbers[playerId]);
+                    game.PlayerHasWageredStatus.Remove(playersnumbers[playerId]);
+                    usersInGameContexts.Remove(playerId);
+                    playersnumbers.Remove(playerId);
+                    returnValue = 1;
+                }
+            }
+
+            return returnValue;
         }
 
         public Dictionary<string, int> GetScores(int gameId)
@@ -970,6 +996,27 @@ namespace WitsClasses
             }
         }
 
+        public List<string> GetPlayersOfGameExceptLeader(int gameId, string leaderUser)
+        {
+            OperationContext currentContext = OperationContext.Current;
+            List<string> players = new List<string>();
+
+            if (currentContext == null)
+            {
+                return players;
+            }
+
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                foreach (string player in game.PlayerScores.Keys)
+                {
+                    players.Add(player);
+                }
+                players.Remove(leaderUser);
+            }
+            return players;
+        }
         public void SavePlayerAnswer(int playerNumber, string answer, int gameId)
         {
 
@@ -1064,7 +1111,17 @@ namespace WitsClasses
             }
         }
 
+        public void ExpelPlayer(string username)
+        {
+            OperationContext currentContext = OperationContext.Current;
 
+            if (currentContext == null)
+            {
+                return;
+            }
+
+            usersInGameContexts[username].BeExpelled();
+        }
 
         public void ReadyToShowAnswer(int gameId, int playerNumber, bool isReady)
         {
