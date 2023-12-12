@@ -689,7 +689,7 @@ namespace WitsClasses
             int newQuestionId;
             do
             {
-                newQuestionId = random.Next(1, 16);
+                newQuestionId = random.Next(1, 150);
             } while (usedQuestionIds.Contains(newQuestionId));
 
             usedQuestionIds.Add(newQuestionId);
@@ -932,9 +932,9 @@ namespace WitsClasses
             Random random = new Random();
 
             // Generar 6 números aleatorios sin repetición
-            while (questionIds.Count < 6)
+            while (questionIds.Count < 80)
             {
-                int newQuestionId = random.Next(1, 17); // El rango debe ser hasta 17 para incluir el 16
+                int newQuestionId = random.Next(1, 150); // El rango debe ser hasta 17 para incluir el 16
                 if (!questionIds.Contains(newQuestionId))
                 {
                     questionIds.Add(newQuestionId);
@@ -1159,18 +1159,41 @@ namespace WitsClasses
 
         public void WhoWon(int gameId, int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture)
         {
-            Dictionary<string, object> playerInfo = new Dictionary<string, object>
-        {
-            { "NumberPlayer", numberPlayer },
-            { "UserName", userName },
-            { "IdCelebration", idCelebration },
-            { "Score", score },
-            { "IdProfilePicture", idProfilePicture }
-        };
+            OperationContext currentContext = OperationContext.Current;
 
-            PlayersFinalScores.Add($"Player{numberPlayer}", playerInfo);
+            if (currentContext == null)
+            {
+                return;
+            }
+
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
+
+                foreach (string userInGame in playerIds)
+                {
+
+                    Dictionary<string, object> playerInfo = new Dictionary<string, object>
+                    {
+                        { "NumberPlayer", numberPlayer },
+                        { "UserName", userName },
+                        { "IdCelebration", idCelebration },
+                        { "Score", score },
+                        { "IdProfilePicture", idProfilePicture }
+                    };
+
+                    try
+                    {
+                        PlayersFinalScores.Add($"Player{numberPlayer}", playerInfo);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        Console.WriteLine($"Error: {ex.Message}");
+                    }
+                }
+            }
         }
-
 
         public void ShowWinner(int gameId)
         {
@@ -1306,6 +1329,7 @@ namespace WitsClasses
                     {
 
                         PlayersFinalScores.Clear();
+                        
                     }
                     catch (Exception ex)
                     {
@@ -1317,15 +1341,5 @@ namespace WitsClasses
             
         }
     }
-
-    
-       /*
-        * El problema está en que busca la respuesta cada vez que se llama, si llama un solo jugador el diccionario 
-        * tiene un solo jugador
-        * 
-        * debo de crear el diccionario y después llamo al GameEnded y cuando el gameEnded junte a todos los jugadores
-        * Entonces ya busca la respuesta de quién tiene más puntos en el diccionario.
-        * 
-       */
 }
        
