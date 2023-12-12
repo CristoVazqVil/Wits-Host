@@ -200,6 +200,14 @@ namespace WitsClasses
                 }
             }
 
+            lock (playersnumbers)
+            {
+                if (playersnumbers.ContainsKey(username))
+                {
+                    playersnumbers.Remove(username);
+                }
+            }
+
             try
             {
                 foreach (string connectedUser in allConnectedUsers)
