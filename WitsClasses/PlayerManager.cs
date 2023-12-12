@@ -681,7 +681,7 @@ namespace WitsClasses
             int newQuestionId;
             do
             {
-                newQuestionId = random.Next(1, 16);
+                newQuestionId = random.Next(1, 150);
             } while (usedQuestionIds.Contains(newQuestionId));
 
             usedQuestionIds.Add(newQuestionId);
@@ -924,9 +924,9 @@ namespace WitsClasses
             Random random = new Random();
 
             // Generar 6 números aleatorios sin repetición
-            while (questionIds.Count < 6)
+            while (questionIds.Count < 80)
             {
-                int newQuestionId = random.Next(1, 17); // El rango debe ser hasta 17 para incluir el 16
+                int newQuestionId = random.Next(1, 150); // El rango debe ser hasta 17 para incluir el 16
                 if (!questionIds.Contains(newQuestionId))
                 {
                     questionIds.Add(newQuestionId);
