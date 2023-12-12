@@ -1153,18 +1153,41 @@ namespace WitsClasses
 
         public void WhoWon(int gameId, int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture)
         {
-            Dictionary<string, object> playerInfo = new Dictionary<string, object>
-        {
-            { "NumberPlayer", numberPlayer },
-            { "UserName", userName },
-            { "IdCelebration", idCelebration },
-            { "Score", score },
-            { "IdProfilePicture", idProfilePicture }
-        };
+            OperationContext currentContext = OperationContext.Current;
 
-            PlayersFinalScores.Add($"Player{numberPlayer}", playerInfo);
+            if (currentContext == null)
+            {
+                return;
+            }
+
+            Game game = games.FirstOrDefault(g => g.GameId == gameId);
+            if (game != null)
+            {
+                List<string> playerIds = FilterPlayersByGame(game, gameId);
+
+                foreach (string userInGame in playerIds)
+                {
+
+                    Dictionary<string, object> playerInfo = new Dictionary<string, object>
+                    {
+                        { "NumberPlayer", numberPlayer },
+                        { "UserName", userName },
+                        { "IdCelebration", idCelebration },
+                        { "Score", score },
+                        { "IdProfilePicture", idProfilePicture }
+                    };
+
+                    try
+                    {
+                        PlayersFinalScores.Add($"Player{numberPlayer}", playerInfo);
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        Console.WriteLine($"Error: {ex.Message}");
+                    }
+                }
+            }
         }
-
 
         public void ShowWinner(int gameId)
         {
@@ -1300,6 +1323,7 @@ namespace WitsClasses
                     {
 
                         PlayersFinalScores.Clear();
+                        
                     }
                     catch (Exception ex)
                     {
@@ -1311,15 +1335,5 @@ namespace WitsClasses
             
         }
     }
-
-    
-       /*
-        * El problema está en que busca la respuesta cada vez que se llama, si llama un solo jugador el diccionario 
-        * tiene un solo jugador
-        * 
-        * debo de crear el diccionario y después llamo al GameEnded y cuando el gameEnded junte a todos los jugadores
-        * Entonces ya busca la respuesta de quién tiene más puntos en el diccionario.
-        * 
-       */
 }
        
