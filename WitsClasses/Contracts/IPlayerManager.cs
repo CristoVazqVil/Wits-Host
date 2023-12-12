@@ -74,29 +74,53 @@ namespace WitsClasses.Contracts
     [DataContract]
     public class Player
     {
-        public String username;
-        public String email;
-        public String userPassword;
-        public int highestScore;
-        public int profilePictureId;
-        public int celebrationId;
+        private string username;
+        private string email;
+        private string userPassword;
+        private int highestScore;
+        private int profilePictureId;
+        private int celebrationId;
 
         [DataMember]
-        public String User { get { return username; } set { username = value; } }
+        public string Username
+        {
+            get { return username; }
+            set { username = value; }
+        }
 
         [DataMember]
-        public String Email { get { return email; } set { email = value; } }
+        public string Email
+        {
+            get { return email; }
+            set { email = value; }
+        }
 
         [DataMember]
-        public String Password { get { return userPassword; } set { userPassword = value; } }
+        public string UserPassword
+        {
+            get { return userPassword; }
+            set { userPassword = value; }
+        }
 
         [DataMember]
-        public int HighestScore { get { return highestScore; } set { highestScore = value; } }
+        public int HighestScore
+        {
+            get { return highestScore; }
+            set { highestScore = value; }
+        }
 
         [DataMember]
-        public int ProfilePictureId { get { return profilePictureId; } set { profilePictureId = value; } }
+        public int ProfilePictureId
+        {
+            get { return profilePictureId; }
+            set { profilePictureId = value; }
+        }
 
         [DataMember]
-        public int CelebrationId { get { return celebrationId; } set { celebrationId = value; } }
+        public int CelebrationId
+        {
+            get { return celebrationId; }
+            set { celebrationId = value; }
+        }
     }
 }

@@ -48,47 +48,91 @@ namespace WitsClasses.Contracts
     [DataContract]
     public class Game
     {
-        public int gameId;
-        public string gameLeader;
-        public int numberOfPlayers;
-        public Dictionary<string, int> playerScores;
-        public List<int> questionIds;
-        public Dictionary<int, string> playerAnswers;
+        private int gameId;
+        private int gameStatus;
+        private string gameLeader;
+        private int numberOfPlayers;
+        private Dictionary<string, int> playerScores;
+        private Dictionary<int, bool> playerReadyToWagerStatus = new Dictionary<int, bool>();
+        private Dictionary<int, bool> playerHasWageredStatus = new Dictionary<int, bool>();
+        private Dictionary<int, bool> playerEnded = new Dictionary<int, bool>();
+        private Dictionary<int, string> playerAnswers;
+        private List<int> questionIds;
 
         [DataMember]
-        public int GameId { get { return gameId; } set { gameId = value; } }
+        public int GameId
+        {
+            get { return gameId; }
+            set { gameId = value; }
+        }
 
         [DataMember]
-        public string GameLeader { get { return gameLeader; } set { gameLeader = value; } }
+        public int GameStatus
+        {
+            get { return gameStatus; }
+            set { gameStatus = value; }
+        }
 
         [DataMember]
-        public int NumberOfPlayers { get { return numberOfPlayers; } set { numberOfPlayers = value; } }
+        public string GameLeader
+        {
+            get { return gameLeader; }
+            set { gameLeader = value; }
+        }
 
         [DataMember]
-        public Dictionary<string, int> PlayerScores { get { return playerScores; } set { playerScores = value; } }
-
-
-        [DataMember]
-        public Dictionary<int, bool> PlayerReadyToWagerStatus { get; set; } = new Dictionary<int, bool>();
-
-        [DataMember]
-        public Dictionary<int, bool> PlayerHasWageredStatus { get; set; } = new Dictionary<int, bool>();
+        public int NumberOfPlayers
+        {
+            get { return numberOfPlayers; }
+            set { numberOfPlayers = value; }
+        }
 
         [DataMember]
-        public Dictionary<int, bool> PlayerEnded { get; set; } = new Dictionary<int, bool>();
-
-       
-
-        [DataMember]
-        public Dictionary<int, string> PlayerAnswers{ get { return playerAnswers; } set { playerAnswers = value; } }
-
+        public Dictionary<string, int> PlayerScores
+        {
+            get { return playerScores; }
+            set { playerScores = value; }
+        }
 
         [DataMember]
-        public List<int> QuestionIds { get { return questionIds; } set { questionIds = value; } }
+        public Dictionary<int, bool> PlayerReadyToWagerStatus
+        {
+            get { return playerReadyToWagerStatus; }
+            set { playerReadyToWagerStatus = value; }
+        }
+
+        [DataMember]
+        public Dictionary<int, bool> PlayerHasWageredStatus
+        {
+            get { return playerHasWageredStatus; }
+            set { playerHasWageredStatus = value; }
+        }
+
+        [DataMember]
+        public Dictionary<int, bool> PlayerEnded
+        {
+            get { return playerEnded; }
+            set { playerEnded = value; }
+        }
+
+        [DataMember]
+        public Dictionary<int, string> PlayerAnswers
+        {
+            get { return playerAnswers; }
+            set { playerAnswers = value; }
+        }
+
+        [DataMember]
+        public List<int> QuestionIds
+        {
+            get { return questionIds; }
+            set { questionIds = value; }
+        }
 
         public Game(int gameId, string gameLeader, int numberOfPlayers)
         {
             GameId = gameId;
+            GameStatus = 0;
             GameLeader = gameLeader;
             NumberOfPlayers = numberOfPlayers;
             PlayerScores = new Dictionary<string, int>();
@@ -99,25 +143,45 @@ namespace WitsClasses.Contracts
 
     public class Question
     {
-        public String questionES;
-        public String answerES;
-        public String questionEN;
-        public String answerEN;
-        public int trueAnswer;
+        private string questionES;
+        private string answerES;
+        private string questionEN;
+        private string answerEN;
+        private int trueAnswer;
 
         [DataMember]
-        public String QuestionES { get { return questionES; } set { questionES = value; } }
+        public string QuestionES
+        {
+            get { return questionES; }
+            set { questionES = value; }
+        }
 
         [DataMember]
-        public String AnswerES { get { return answerES; } set { answerES = value; } }
+        public string AnswerES
+        {
+            get { return answerES; }
+            set { answerES = value; }
+        }
 
         [DataMember]
-        public String QuestionEN { get { return questionEN; } set { questionEN = value; } }
+        public string QuestionEN
+        {
+            get { return questionEN; }
+            set { questionEN = value; }
+        }
 
         [DataMember]
-        public String AnswerEN { get { return answerEN; } set { answerEN = value; } }
+        public string AnswerEN
+        {
+            get { return answerEN; }
+            set { answerEN = value; }
+        }
 
         [DataMember]
-        public int TrueAnswer { get { return trueAnswer; } set { trueAnswer = value; } }
+        public int TrueAnswer
+        {
+            get { return trueAnswer; }
+            set { trueAnswer = value; }
+        }
     }
 }

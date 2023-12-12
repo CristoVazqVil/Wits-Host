@@ -58,12 +58,12 @@ namespace WitsClasses
                 context.Database.Log = Console.WriteLine;
 
                 Players newUser = new Players();
-                newUser.username = player.username;
-                newUser.email = player.email;
-                newUser.userPassword = player.userPassword;
-                newUser.highestScore = player.highestScore;
-                newUser.profilePictureId = player.profilePictureId;
-                newUser.celebrationId = player.celebrationId;
+                newUser.username = player.Username;
+                newUser.email = player.Email;
+                newUser.userPassword = player.UserPassword;
+                newUser.highestScore = player.HighestScore;
+                newUser.profilePictureId = player.ProfilePictureId;
+                newUser.celebrationId = player.CelebrationId;
 
                 try
                 {
@@ -236,12 +236,12 @@ namespace WitsClasses
                     {
                         Player foundPlayer = new Player
                         {
-                            username = player.username,
-                            email = player.email,
-                            userPassword = player.userPassword,
-                            highestScore = (int)player.highestScore,
-                            profilePictureId = (int)player.profilePictureId,
-                            celebrationId = (int)player.celebrationId
+                            Username = player.username,
+                            Email = player.email,
+                            UserPassword = player.userPassword,
+                            HighestScore = (int)player.highestScore,
+                            ProfilePictureId = (int)player.profilePictureId,
+                            CelebrationId = (int)player.celebrationId
                         };
 
                         return foundPlayer;
@@ -272,12 +272,12 @@ namespace WitsClasses
                     {
                         Player foundPlayer = new Player
                         {
-                            username = player.username,
-                            email = player.email,
-                            userPassword = player.userPassword,
-                            highestScore = (int)player.highestScore,
-                            profilePictureId = (int)player.profilePictureId,
-                            celebrationId = (int)player.celebrationId
+                            Username = player.username,
+                            Email = player.email,
+                            UserPassword = player.userPassword,
+                            HighestScore = (int)player.highestScore,
+                            ProfilePictureId = (int)player.profilePictureId,
+                            CelebrationId = (int)player.celebrationId
                         };
 
                         return foundPlayer;
@@ -713,11 +713,11 @@ namespace WitsClasses
 
                     if (question != null)
                     {
-                        foundQuestion.questionES = question.questionES;
-                        foundQuestion.questionEN = question.questionEN;
-                        foundQuestion.answerES = question.answerES;
-                        foundQuestion.answerEN = question.answerEN;
-                        foundQuestion.trueAnswer = (int)question.trueAnswer;
+                        foundQuestion.QuestionES = question.questionES;
+                        foundQuestion.QuestionEN = question.questionEN;
+                        foundQuestion.AnswerES = question.answerES;
+                        foundQuestion.AnswerEN = question.answerEN;
+                        foundQuestion.TrueAnswer = (int)question.trueAnswer;
                     }
                     return foundQuestion;
                 }
@@ -766,8 +766,8 @@ namespace WitsClasses
 
             var newGame = new Game(gameId, gameLeader, 1);
             newGame.PlayerScores.Add(gameLeader, 0);
-            newGame.PlayerAnswers.Add(newGame.numberOfPlayers, "");
-            playersnumbers.Add(gameLeader, newGame.numberOfPlayers);
+            newGame.PlayerAnswers.Add(newGame.NumberOfPlayers, "");
+            playersnumbers.Add(gameLeader, newGame.NumberOfPlayers);
 
             games.Add(newGame);
         }
@@ -780,13 +780,13 @@ namespace WitsClasses
             {
                 if (!game.PlayerScores.ContainsKey(playerId))
                 {
-                    if (game.numberOfPlayers < 4)
+                    if (game.NumberOfPlayers < 4 || game.GameStatus == 0)
                     {
-                        game.numberOfPlayers = game.numberOfPlayers + 1;
+                        game.NumberOfPlayers = game.NumberOfPlayers + 1;
                         game.PlayerScores.Add(playerId, 0);
-                        game.PlayerAnswers.Add(game.numberOfPlayers, "");
-                        playersnumbers.Add(playerId, game.numberOfPlayers);
-                        returnValue = game.numberOfPlayers;
+                        game.PlayerAnswers.Add(game.NumberOfPlayers, "");
+                        playersnumbers.Add(playerId, game.NumberOfPlayers);
+                        returnValue = game.NumberOfPlayers;
                     }
                 }
                 return returnValue;
@@ -807,7 +807,7 @@ namespace WitsClasses
                 if (game.PlayerScores.ContainsKey(playerId))
                 {
                     game.PlayerScores.Remove(playerId);
-                    game.numberOfPlayers = game.numberOfPlayers - 1;
+                    game.NumberOfPlayers = game.NumberOfPlayers - 1;
                     game.PlayerReadyToWagerStatus.Remove(playersnumbers[playerId]);
                     game.PlayerAnswers.Remove(playersnumbers[playerId]);
                     game.PlayerHasWageredStatus.Remove(playersnumbers[playerId]);
@@ -962,13 +962,11 @@ namespace WitsClasses
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
             if (game != null)
             {
-                // Generar la lista de preguntas
                 List<int> questionIds = GenerateRandomQuestionIds();
-
-                // Asignar la lista al contexto del juego
-                game.QuestionIds = questionIds;
-
                 List<string> playerIds = FilterPlayersByGame(game, gameId);
+                
+                game.QuestionIds = questionIds;
+                game.GameStatus = 1;
 
                 foreach (string userInGame in playerIds)
                 {
