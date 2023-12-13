@@ -76,6 +76,12 @@ namespace WitsClasses
                     affectedTables = 0;
                     return affectedTables;
                 }
+                catch (EntityException ex)
+                {
+                    witslogger.Error("Entity Framework error: " + ex.Message);
+                    affectedTables = 0;
+                    return affectedTables;
+                }
             }
 
             return affectedTables;
