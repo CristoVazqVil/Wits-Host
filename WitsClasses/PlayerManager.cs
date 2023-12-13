@@ -1183,6 +1183,7 @@ namespace WitsClasses
                         { "IdProfilePicture", idProfilePicture }
                     };
 
+
                     try
                     {
                         PlayersFinalScores.Add($"Player{numberPlayer}", playerInfo);
@@ -1233,40 +1234,67 @@ namespace WitsClasses
                 {
                     try
                     {
-
                         if (winnersInfo.Count > 1)
                         {
-                            Console.WriteLine("Hubo un empate:");
                             usersInGameContexts[userInGame].TieBreaker();
                         }
-                        else
-                        {
-                            Console.WriteLine("Ganador:");
-                        }
+                       
 
-              
-                        if (winnersInfo.Count  < 2)
+                        if (winnersInfo.Count < 2)
                         {
-                            Console.WriteLine("ACTUAL Winner Information:");
-                            foreach (var winnerInfo in winnersInfo)
-                            {
-                                foreach (var kvp in winnerInfo)
-                                {
-                                    Console.WriteLine($"{kvp.Key}: {kvp.Value}");
-                                }
-                                Console.WriteLine();
-                            }
-
                             usersInGameContexts[userInGame].ShowVictoryScreen(
                                 (string)winnersInfo[0]["UserName"],
                                 (int)winnersInfo[0]["IdProfilePicture"],
                                 (int)winnersInfo[0]["IdCelebration"],
                                 (int)winnersInfo[0]["Score"]
                             );
-                        }
-                        else
-                        {
-                            Console.WriteLine("No winner information available.");
+
+                            using (var context = new WitsAndWagersEntities())
+                            {
+                                context.Database.Log = Console.WriteLine;
+                                try
+                                {
+
+                                    foreach (var winnerInfo in winnersInfo)
+                                    {
+                                        string username = (string)winnerInfo["UserName"];
+
+                                        var player = context.Players.Find(username);
+
+                                        if (player != null)
+                                        {
+                                            Player highestScorePlayer = new Player
+                                            {
+                                                HighestScore = (int)player.highestScore,
+                                            };
+
+
+                                            if (highestScorePlayer.HighestScore < (int)winnerInfo["Score"])
+                                            {
+                                                context.Database.Log = Console.WriteLine;
+                                                try
+                                                {
+                                                    player.highestScore = (int)winnerInfo["Score"];
+                                                    context.SaveChanges();
+                                                    
+                                                }
+                                                catch (SqlException ex)
+                                                {
+                                                    Console.WriteLine(ex.Message);
+                                                }
+
+                                            }
+
+                                            
+
+                                        }
+                                    }
+                                }
+                                catch (SqlException ex)
+                                {
+                                    witslogger.Error(ex);
+                                }
+                            }
                         }
                     }
                     catch (Exception ex)
@@ -1275,8 +1303,13 @@ namespace WitsClasses
                     }
                 }
             }
-        }
 
+            winnersInfo.Clear();
+            PlayersFinalScores.Clear();
+            playerAnswers.Clear();
+            playerSelectedAnswers.Clear();
+
+        }
 
 
 
