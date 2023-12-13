@@ -39,7 +39,48 @@ namespace WitsClasses
         {
         }
 
+        private void RemoveFromEverywhere(string user)
+        {
+            lock (connectedUsersInMenu)
+            {
+                if (connectedUsersInMenu.ContainsKey(user))
+                {
+                    connectedUsersInMenu.Remove(user);
+                }
+            }
 
+            lock (usersInLobbyContexts)
+            {
+                if (usersInLobbyContexts.ContainsKey(user))
+                {
+                    usersInLobbyContexts.Remove(user);
+                }
+            }
+
+            lock (playersnumbers)
+            {
+                if (playersnumbers.ContainsKey(user))
+                {
+                    playersnumbers.Remove(user);
+                }
+            }
+
+            lock (usersInGameContexts)
+            {
+                if (usersInGameContexts.ContainsKey(user))
+                {
+                    usersInGameContexts.Remove(user);
+                }
+            }
+
+            lock (allConnectedUsers)
+            {
+                if (allConnectedUsers.Contains(user))
+                {
+                    allConnectedUsers.Remove(user);
+                }
+            }
+        }
 
         public static PlayerManager GetInstance()
         {
@@ -70,15 +111,15 @@ namespace WitsClasses
                     var newPlayer = context.Players.Add(newUser);
                     affectedTables = context.SaveChanges();
                 }
-                catch (DbUpdateException ex)
+                catch (DataException ex)
                 {
                     witslogger.Error(ex);
                     affectedTables = 0;
                     return affectedTables;
                 }
-                catch (EntityException ex)
+                catch (SqlException ex)
                 {
-                    witslogger.Error("Entity Framework error: " + ex.Message);
+                    witslogger.Error(ex);
                     affectedTables = 0;
                     return affectedTables;
                 }
@@ -107,7 +148,13 @@ namespace WitsClasses
                         affectedRows = 0;
                     }
                 }
-                catch (EntityException ex)
+                catch (DataException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedRows = 0;
+                    return affectedRows;
+                }
+                catch (SqlException ex)
                 {
                     witslogger.Error(ex);
                     affectedRows = 0;
@@ -145,7 +192,13 @@ namespace WitsClasses
                         affectedTables = 0;
                     }
                 }
-                catch (EntityException ex)
+                catch (DataException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
+                    return affectedTables;
+                }
+                catch (SqlException ex)
                 {
                     witslogger.Error(ex);
                     affectedTables = 0;
@@ -158,28 +211,39 @@ namespace WitsClasses
 
         public void AddConnectedUser(string username)
         {
-            if (!connectedUsersInMenu.ContainsKey(username))
+            try
             {
-                IConnectedUsersCallback currentUserCallbackChannel = OperationContext.Current.GetCallbackChannel<IConnectedUsersCallback>();
-                connectedUsersInMenu.Add(username, currentUserCallbackChannel);
-                connectedUsersInMenu[username].UpdateConnectedFriends();
+                if (!connectedUsersInMenu.ContainsKey(username))
+                {
+                    IConnectedUsersCallback currentUserCallbackChannel = OperationContext.Current.GetCallbackChannel<IConnectedUsersCallback>();
+                    connectedUsersInMenu.Add(username, currentUserCallbackChannel);
+                    connectedUsersInMenu[username].UpdateConnectedFriends();
+                }
+            }
+            catch (CommunicationException ex)
+            {
+                witslogger.Error(ex);
+                RemoveFromEverywhere(username);
+            }
+            catch (TimeoutException ex)
+            {
+                witslogger.Error(ex);
             }
 
             if (!allConnectedUsers.Contains(username))
             {
                 allConnectedUsers.Add(username);
-
-                try
+                    
+                foreach (string connectedUser in allConnectedUsers)
                 {
-                    foreach (string connectedUser in allConnectedUsers)
+                    try
                     {
                         connectedUsersInMenu[connectedUser].UpdateConnectedFriends();
                     }
-
-                }
-                catch (Exception ex)
-                {
-                    witslogger.Error(ex);
+                    catch (KeyNotFoundException ex)
+                    {
+                        witslogger.Error(ex);
+                    }
                 }
             }
         }
@@ -214,17 +278,21 @@ namespace WitsClasses
                 }
             }
 
-            try
+            foreach (string connectedUser in allConnectedUsers)
             {
-                foreach (string connectedUser in allConnectedUsers)
+                try
                 {
                     connectedUsersInMenu[connectedUser].UpdateConnectedFriends();
                 }
-
-            }
-            catch (Exception ex)
-            {
-                witslogger.Error(ex);
+                catch (CommunicationException ex)
+                {
+                    witslogger.Error(ex);
+                    RemoveFromEverywhere(username);
+                }
+                catch (TimeoutException ex)
+                {
+                    witslogger.Error(ex);
+                }
             }
         }
 
@@ -258,6 +326,11 @@ namespace WitsClasses
                     }
                 }
                 catch (SqlException ex)
+                {
+                    witslogger.Error(ex);
+                    return null;
+                }
+                catch (EntityException ex)
                 {
                     witslogger.Error(ex);
                     return null;
@@ -298,6 +371,11 @@ namespace WitsClasses
                     witslogger.Error(ex);
                     return null;
                 }
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    return null;
+                }
             }
         }
 
@@ -320,6 +398,11 @@ namespace WitsClasses
                     witslogger.Error(ex);
                     return new List<string>();
                 }
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    return new List<string>();
+                }
             }
         }
 
@@ -338,6 +421,11 @@ namespace WitsClasses
                     return requests;
                 }
                 catch (SqlException ex)
+                {
+                    witslogger.Error(ex);
+                    return new List<string>();
+                }
+                catch (EntityException ex)
                 {
                     witslogger.Error(ex);
                     return new List<string>();
@@ -369,6 +457,11 @@ namespace WitsClasses
                     witslogger.Error(ex);
                     return null;
                 }
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    return null;
+                }
             }
         }
 
@@ -396,11 +489,15 @@ namespace WitsClasses
                         affectedTables = context.SaveChanges();
                     }
                 }
-                catch (EntityException ex)
+                catch (DataException ex)
                 {
                     witslogger.Error(ex);
                     affectedTables = 0;
-                    return affectedTables;
+                }
+                catch (SqlException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
                 }
 
             }
@@ -432,7 +529,16 @@ namespace WitsClasses
                 {
                     witslogger.Error(ex);
                     affectedTables = 0;
-                    return affectedTables;
+                }
+                catch (DataException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
+                }
+                catch (SqlException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
                 }
             }
 
@@ -464,7 +570,16 @@ namespace WitsClasses
                 {
                     witslogger.Error(ex);
                     affectedTables = 0;
-                    return affectedTables;
+                }
+                catch (DataException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
+                }
+                catch (SqlException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
                 }
             }
 
@@ -496,7 +611,16 @@ namespace WitsClasses
                 {
                     witslogger.Error(ex);
                     affectedTables = 0;
-                    return affectedTables;
+                }
+                catch (DataException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
+                }
+                catch (SqlException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
                 }
             }
 
@@ -530,7 +654,16 @@ namespace WitsClasses
                     {
                         witslogger.Error(ex);
                         affectedTables = 0;
-                        return affectedTables;
+                    }
+                    catch (DataException ex)
+                    {
+                        witslogger.Error(ex);
+                        affectedTables = 0;
+                    }
+                    catch (SqlException ex)
+                    {
+                        witslogger.Error(ex);
+                        affectedTables = 0;
                     }
                 }
             }
@@ -569,7 +702,16 @@ namespace WitsClasses
                     {
                         witslogger.Error(ex);
                         affectedTables = 0;
-                        return affectedTables;
+                    }
+                    catch (DataException ex)
+                    {
+                        witslogger.Error(ex);
+                        affectedTables = 0;
+                    }
+                    catch (SqlException ex)
+                    {
+                        witslogger.Error(ex);
+                        affectedTables = 0;
                     }
                 }
             }
@@ -589,6 +731,16 @@ namespace WitsClasses
                     return isBlocked;
                 }
                 catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    return false;
+                }
+                catch (DataException ex)
+                {
+                    witslogger.Error(ex);
+                    return false;
+                }
+                catch (SqlException ex)
                 {
                     witslogger.Error(ex);
                     return false;
@@ -630,6 +782,16 @@ namespace WitsClasses
                         witslogger.Error(ex);
                         affectedTables = 0;
                     }
+                    catch (DataException ex)
+                    {
+                        witslogger.Error(ex);
+                        affectedTables = 0;
+                    }
+                    catch (SqlException ex)
+                    {
+                        witslogger.Error(ex);
+                        affectedTables = 0;
+                    }
                 }
             }
 
@@ -638,6 +800,8 @@ namespace WitsClasses
 
         public bool UpdateProfilePicture(string username, int profilePictureId)
         {
+            bool validator = false;
+
             using (var context = new WitsAndWagersEntities())
             {
                 context.Database.Log = Console.WriteLine;
@@ -652,18 +816,30 @@ namespace WitsClasses
                         return true;
                     }
                 }
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    validator = false;
+                }
+                catch (DataException ex)
+                {
+                    witslogger.Error(ex);
+                    validator = false;
+                }
                 catch (SqlException ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    witslogger.Error(ex);
+                    validator = false;
                 }
             }
 
-            return false;
+            return validator;
         }
 
 
         public bool UpdateCelebration(string username, int celebrationId)
         {
+            bool validator = false;
             using (var context = new WitsAndWagersEntities())
             {
                 context.Database.Log = Console.WriteLine;
@@ -678,17 +854,25 @@ namespace WitsClasses
                         return true;
                     }
                 }
+                catch(EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    validator = false;
+                }
+                catch (DataException ex)
+                {
+                    witslogger.Error(ex);
+                    validator = false;
+                }
                 catch (SqlException ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    witslogger.Error(ex);
+                    validator = false;
                 }
             }
 
-            return false;
+            return validator;
         }
-
-
-   
 
         public int GetRandomQuestionId()
         {
@@ -702,9 +886,6 @@ namespace WitsClasses
 
             return newQuestionId;
         }
-
-
-
 
         public Question GetQuestionByID(int questionId)
         {
@@ -728,6 +909,11 @@ namespace WitsClasses
                     return foundQuestion;
                 }
                 catch (SqlException ex)
+                {
+                    witslogger.Error(ex);
+                    return null;
+                }
+                catch (EntityException ex)
                 {
                     witslogger.Error(ex);
                     return null;
@@ -760,6 +946,11 @@ namespace WitsClasses
                     witslogger.Error(ex);
                     return null;
                 }
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    return null;
+                }
             }
         }
 
@@ -786,7 +977,7 @@ namespace WitsClasses
             {
                 if (!game.PlayerScores.ContainsKey(playerId))
                 {
-                    if (game.NumberOfPlayers < 4 || game.GameStatus == 0)
+                    if (game.NumberOfPlayers < 4 && game.GameStatus == 0)
                     {
                         game.NumberOfPlayers = game.NumberOfPlayers + 1;
                         game.PlayerScores.Add(playerId, 0);
@@ -829,28 +1020,72 @@ namespace WitsClasses
         public Dictionary<string, int> GetScores(int gameId)
         {
             var game = games.FirstOrDefault(g => g.GameId == gameId);
-            return game?.PlayerScores;
+
+            if (game != null)
+            {
+                return game?.PlayerScores;
+            }
+            else
+            {
+                return null;
+            }
+            
         }
 
         public void ModifyScore(int gameId, string playerId, int points)
         {
-            var game = games.FirstOrDefault(g => g.GameId == gameId);
-            if (game?.PlayerScores.ContainsKey(playerId) == true)
+            try
             {
-                game.PlayerScores[playerId] += points;
+                var game = games.FirstOrDefault(g => g.GameId == gameId);
+                if (game != null && game.PlayerScores.ContainsKey(playerId))
+                {
+                    game.PlayerScores[playerId] += points;
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                witslogger.Error(ex);
             }
         }
 
         public int GetPlayerScore(int gameId, string playerId)
         {
-            var game = games.First(g => g.GameId == gameId);
-            return game.PlayerScores[playerId];
+            try
+            {
+                var game = games.First(g => g.GameId == gameId);
+                return game.PlayerScores[playerId];
+            }
+            catch (InvalidOperationException ex)
+            {
+                witslogger.Error(ex);
+                return 0; 
+            }
+            catch (KeyNotFoundException ex)
+            {
+                witslogger.Error(ex);
+                return 0;
+            }
         }
 
         public string GetGameLeader(int gameId)
         {
-            Game game = games.FirstOrDefault(g => g.GameId == gameId);
-            return game.GameLeader;
+            try
+            {
+                Game game = games.FirstOrDefault(g => g.GameId == gameId);
+                if (game != null)
+                {
+                    return game.GameLeader;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                witslogger.Error(ex);
+                return null; 
+            }
         }
 
 
@@ -915,32 +1150,29 @@ namespace WitsClasses
                     {
                         usersInLobbyContexts[userInGame].UpdateChat(message);
                     }
-                    catch (Exception ex)
+                    catch (TimeoutException ex)
                     {
                         witslogger.Error(ex);
+                        RemoveFromEverywhere(userInGame);
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        witslogger.Error(ex);
+                        RemoveFromEverywhere(userInGame);
                     }
                 }
             }
         }
-
-
-
-        
-
-
-
-
-
 
         private List<int> GenerateRandomQuestionIds()
         {
             List<int> questionIds = new List<int>();
             Random random = new Random();
 
-            // Generar 6 números aleatorios sin repetición
             while (questionIds.Count < 80)
             {
-                int newQuestionId = random.Next(1, 150); // El rango debe ser hasta 17 para incluir el 16
+                int newQuestionId = random.Next(1, 150); 
+
                 if (!questionIds.Contains(newQuestionId))
                 {
                     questionIds.Add(newQuestionId);
@@ -953,7 +1185,16 @@ namespace WitsClasses
         public List<int> GetQuestionIds(int gameId)
         {
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
-            return game?.QuestionIds;
+
+            if (game != null)
+            {
+                return game?.QuestionIds;
+            }
+            else
+            {
+                return null;
+            }
+            
         }
 
         public void StartGame(int gameId)
@@ -980,9 +1221,17 @@ namespace WitsClasses
                     {
                         usersInLobbyContexts[userInGame].StartGamePage();
                     }
-                    catch (Exception ex)
+                    catch (TimeoutException ex)
                     {
                         witslogger.Error(ex);
+                        RemoveFromEverywhere(userInGame);
+                        RemovePlayerInGame(gameId, userInGame);
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        witslogger.Error(ex);
+                        RemoveFromEverywhere(userInGame);
+                        RemovePlayerInGame(gameId, userInGame);
                     }
                 }
             }
@@ -1010,34 +1259,39 @@ namespace WitsClasses
 
         public List<string> GetPlayersOfGameExceptLeader(int gameId, string leaderUser)
         {
-            OperationContext currentContext = OperationContext.Current;
             List<string> players = new List<string>();
 
-            if (currentContext == null)
+            try
             {
-                return players;
+                OperationContext currentContext = OperationContext.Current;
+
+                if (currentContext == null)
+                {
+                    return players;
+                }
+
+                Game game = games.FirstOrDefault(g => g.GameId == gameId);
+
+                if (game != null)
+                {
+                    foreach (string player in game.PlayerScores.Keys)
+                    {
+                        players.Add(player);
+                    }
+                    players.Remove(leaderUser);
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                witslogger.Error(ex);
             }
 
-            Game game = games.FirstOrDefault(g => g.GameId == gameId);
-            if (game != null)
-            {
-                foreach (string player in game.PlayerScores.Keys)
-                {
-                    players.Add(player);
-                }
-                players.Remove(leaderUser);
-            }
             return players;
         }
+
         public void SavePlayerAnswer(int playerNumber, string answer, int gameId)
         {
-
-
-            // Aquí puedes realizar cualquier lógica adicional antes de guardar la respuesta en el diccionario
             playerAnswers[playerNumber] = answer;
-
-            // Puedes imprimir el diccionario en la consola si es necesario
-          
 
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
             if (game != null)
@@ -1050,9 +1304,17 @@ namespace WitsClasses
                     {
                         usersInGameContexts[userInGame].UpdateAnswers(playerAnswers);
                     }
-                    catch (Exception ex)
+                    catch (TimeoutException ex)
                     {
                         witslogger.Error(ex);
+                        RemoveFromEverywhere(userInGame);
+                        RemovePlayerInGame(gameId, userInGame);
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        witslogger.Error(ex);
+                        RemoveFromEverywhere(userInGame);
+                        RemovePlayerInGame(gameId, userInGame);
                     }
                 }
             }
@@ -1073,10 +1335,17 @@ namespace WitsClasses
                     {
                         usersInGameContexts[userInGame].UpdateSelection(playerSelectedAnswers);
                     }
-                    catch (Exception ex)
+                    catch (TimeoutException ex)
                     {
                         witslogger.Error(ex);
-                        Console.WriteLine(ex);
+                        RemoveFromEverywhere(userInGame);
+                        RemovePlayerInGame(gameId, userInGame);
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        witslogger.Error(ex);
+                        RemoveFromEverywhere(userInGame);
+                        RemovePlayerInGame(gameId, userInGame);
                     }
                 }
             }
@@ -1098,18 +1367,30 @@ namespace WitsClasses
 
                 foreach (string userInGame in playerIds)
                 {
-                    // Crea o actualiza la entrada del jugador en el diccionario de listo/no listo
-                    game.PlayerReadyToWagerStatus[playerNumber] = isReady;
-
-
-                    Console.WriteLine($" JUGADORES: Player {playerNumber}: Ready Status = {isReady}");
-                    // Verifica si todos los jugadores están listos
-                    bool allPlayersReady = game.PlayerReadyToWagerStatus.All(pair => pair.Value);
-
-                    if (allPlayersReady)
+                    try
                     {
-                        usersInGameContexts[userInGame].ShowEnterWager();
+                        game.PlayerReadyToWagerStatus[playerNumber] = isReady;
+
+                        bool allPlayersReady = game.PlayerReadyToWagerStatus.All(pair => pair.Value);
+
+                        if (allPlayersReady)
+                        {
+                            usersInGameContexts[userInGame].ShowEnterWager();
+                        }
                     }
+                    catch (TimeoutException ex)
+                    {
+                        witslogger.Error(ex);
+                        RemoveFromEverywhere(userInGame);
+                        RemovePlayerInGame(gameId, userInGame);
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        witslogger.Error(ex);
+                        RemoveFromEverywhere(userInGame);
+                        RemovePlayerInGame(gameId, userInGame);
+                    }
+                    
                 }
             }
         }
@@ -1123,7 +1404,21 @@ namespace WitsClasses
                 return;
             }
 
-            usersInGameContexts[username].BeExpelled();
+            try
+            {
+                usersInGameContexts[username].BeExpelled();
+            }
+            catch (TimeoutException ex)
+            {
+                witslogger.Error(ex);
+                RemoveFromEverywhere(username);
+            }
+            catch (CommunicationException ex)
+            {
+                witslogger.Error(ex);
+                RemoveFromEverywhere(username);
+            }
+            
         }
 
         public void ReadyToShowAnswer(int gameId, int playerNumber, bool isReady)
@@ -1142,26 +1437,32 @@ namespace WitsClasses
 
                 foreach (string userInGame in playerIds)
                 {
-                    // Crea o actualiza la entrada del jugador en el diccionario de listo/no listo
-                    game.PlayerHasWageredStatus[playerNumber] = isReady;
-
-
-                    Console.WriteLine($" JUGADORES: Player {playerNumber}: Ready Status = {isReady}");
-                    // Verifica si todos los jugadores están listos
-                    bool allPlayersReady = game.PlayerHasWageredStatus.All(pair => pair.Value);
-
-                    if (allPlayersReady)
+                    try
                     {
-                        usersInGameContexts[userInGame].ShowTrueAnswer();
+                        game.PlayerHasWageredStatus[playerNumber] = isReady;
+
+                        bool allPlayersReady = game.PlayerHasWageredStatus.All(pair => pair.Value);
+
+                        if (allPlayersReady)
+                        {
+                            usersInGameContexts[userInGame].ShowTrueAnswer();
+                        }
+                    }
+                    catch (TimeoutException ex)
+                    {
+                        witslogger.Error(ex);
+                        RemoveFromEverywhere(userInGame);
+                        RemovePlayerInGame(gameId, userInGame);
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        witslogger.Error(ex);
+                        RemoveFromEverywhere(userInGame);
+                        RemovePlayerInGame(gameId, userInGame);
                     }
                 }
             }
         }
-
-
-
-
-
 
         public void WhoWon(int gameId, int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture)
         {
@@ -1189,14 +1490,13 @@ namespace WitsClasses
                         { "IdProfilePicture", idProfilePicture }
                     };
 
-
                     try
                     {
                         PlayersFinalScores.Add($"Player{numberPlayer}", playerInfo);
                     }
                     catch (ArgumentException ex)
                     {
-                        Console.WriteLine($"Error: {ex.Message}");
+                        witslogger.Error(ex);
                     }
                 }
             }
@@ -1244,7 +1544,6 @@ namespace WitsClasses
                         {
                             usersInGameContexts[userInGame].TieBreaker();
                         }
-                       
 
                         if (winnersInfo.Count < 2)
                         {
@@ -1260,7 +1559,6 @@ namespace WitsClasses
                                 context.Database.Log = Console.WriteLine;
                                 try
                                 {
-
                                     foreach (var winnerInfo in winnersInfo)
                                     {
                                         string username = (string)winnerInfo["UserName"];
@@ -1278,23 +1576,20 @@ namespace WitsClasses
                                             if (highestScorePlayer.HighestScore < (int)winnerInfo["Score"])
                                             {
                                                 context.Database.Log = Console.WriteLine;
-                                                try
-                                                {
-                                                    player.highestScore = (int)winnerInfo["Score"];
-                                                    context.SaveChanges();
-                                                    
-                                                }
-                                                catch (SqlException ex)
-                                                {
-                                                    Console.WriteLine(ex.Message);
-                                                }
 
+                                                player.highestScore = (int)winnerInfo["Score"];
+                                                context.SaveChanges();
                                             }
-
-                                            
-
                                         }
                                     }
+                                }
+                                catch (EntityException ex)
+                                {
+                                    witslogger.Error(ex);
+                                }
+                                catch (DataException ex)
+                                {
+                                    witslogger.Error(ex);
                                 }
                                 catch (SqlException ex)
                                 {
@@ -1303,9 +1598,17 @@ namespace WitsClasses
                             }
                         }
                     }
-                    catch (Exception ex)
+                    catch (TimeoutException ex)
                     {
                         witslogger.Error(ex);
+                        RemoveFromEverywhere(userInGame);
+                        RemovePlayerInGame(gameId, userInGame);
+                    }
+                    catch (CommunicationException ex)
+                    {
+                        witslogger.Error(ex);
+                        RemoveFromEverywhere(userInGame);
+                        RemovePlayerInGame(gameId, userInGame);
                     }
                 }
             }
@@ -1314,11 +1617,7 @@ namespace WitsClasses
             PlayersFinalScores.Clear();
             playerAnswers.Clear();
             playerSelectedAnswers.Clear();
-
         }
-
-
-
 
         public void GameEnded(int gameId, int playerNumber, bool isRegistered)
         {
@@ -1336,23 +1635,16 @@ namespace WitsClasses
 
                 foreach (string userInGame in playerIds)
                 {
-                    // Crea o actualiza la entrada del jugador en el diccionario de listo/no listo
                     game.PlayerEnded[playerNumber] = isRegistered;
 
-
-                    Console.WriteLine($" JUGADORES: Player {playerNumber}: Ended Status = {isRegistered}");
-                    // Verifica si todos los jugadores están listos
                     bool allPlayersReady = game.PlayerEnded.All(pair => pair.Value);
 
                     if (allPlayersReady)
                     {
-                        
                         ShowWinner(gameId);
                     }
                 }
             }
-
-
         }
 
         public void CleanWinners(int gameId)
@@ -1366,18 +1658,14 @@ namespace WitsClasses
                 {
                     try
                     {
-
                         PlayersFinalScores.Clear();
-                        
                     }
-                    catch (Exception ex)
+                    catch (InvalidOperationException ex)
                     {
                         witslogger.Error(ex);
                     }
                 }
             }
-
-            
         }
     }
 }

@@ -4,6 +4,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using WitsClasses.Contracts;
+using System.Security.Cryptography;
 
 namespace WitsHost
 {
