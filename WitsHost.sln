@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WitsHost", "WitsHost.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WitsClasses", "WitsClasses\WitsClasses.csproj", "{C7D78F44-34E0-4F80-9612-EFBD9D197EB9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WitsClassesTests", "WitsClassesTests\WitsClassesTests.csproj", "{AF04D60A-0894-4F88-B195-D7EB5ADE272E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C7D78F44-34E0-4F80-9612-EFBD9D197EB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7D78F44-34E0-4F80-9612-EFBD9D197EB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7D78F44-34E0-4F80-9612-EFBD9D197EB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF04D60A-0894-4F88-B195-D7EB5ADE272E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF04D60A-0894-4F88-B195-D7EB5ADE272E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF04D60A-0894-4F88-B195-D7EB5ADE272E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF04D60A-0894-4F88-B195-D7EB5ADE272E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

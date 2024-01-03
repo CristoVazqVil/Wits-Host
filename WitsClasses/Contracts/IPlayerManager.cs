@@ -74,53 +74,44 @@ namespace WitsClasses.Contracts
     [DataContract]
     public class Player
     {
-        private string username;
-        private string email;
-        private string userPassword;
-        private int highestScore;
-        private int profilePictureId;
-        private int celebrationId;
+        [DataMember]
+        public string Username { get; set; }
 
         [DataMember]
-        public string Username
+        public string Email { get; set; }
+
+        [DataMember]
+        public string UserPassword { get; set; }
+
+        [DataMember]
+        public int HighestScore { get; set; }
+
+        [DataMember]
+        public int ProfilePictureId { get; set; }
+
+        [DataMember]
+        public int CelebrationId { get; set; }
+
+        public override bool Equals(object obj)
         {
-            get { return username; }
-            set { username = value; }
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            Player other = (Player)obj;
+
+            return Username == other.Username &&
+                   Email == other.Email &&
+                   UserPassword == other.UserPassword &&
+                   HighestScore == other.HighestScore &&
+                   ProfilePictureId == other.ProfilePictureId &&
+                   CelebrationId == other.CelebrationId;
         }
 
-        [DataMember]
-        public string Email
+        public override int GetHashCode()
         {
-            get { return email; }
-            set { email = value; }
-        }
-
-        [DataMember]
-        public string UserPassword
-        {
-            get { return userPassword; }
-            set { userPassword = value; }
-        }
-
-        [DataMember]
-        public int HighestScore
-        {
-            get { return highestScore; }
-            set { highestScore = value; }
-        }
-
-        [DataMember]
-        public int ProfilePictureId
-        {
-            get { return profilePictureId; }
-            set { profilePictureId = value; }
-        }
-
-        [DataMember]
-        public int CelebrationId
-        {
-            get { return celebrationId; }
-            set { celebrationId = value; }
+            return base.GetHashCode();
         }
     }
 }

@@ -10,6 +10,9 @@ namespace WitsClasses.Contracts
         void AddConnectedUser(string username);
 
         [OperationContract(IsOneWay = true)]
+        void AddConnectedUserInMenu(string username);
+
+        [OperationContract(IsOneWay = true)]
         void RemoveConnectedUserInMenu(string username);
 
         [OperationContract(IsOneWay = true)]
