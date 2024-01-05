@@ -40,7 +40,7 @@ namespace WitsClasses
         {
         }
 
-        private void RemoveFromEverywhere(string user)
+        public void RemoveFromEverywhere(string user)
         {
             try
             {
