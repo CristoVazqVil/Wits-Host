@@ -19,6 +19,9 @@ namespace WitsClasses.Contracts
         void RemoveConnectedUser(string username);
 
         [OperationContract]
+        void RemoveFromEverywhere(string user);
+
+        [OperationContract]
         List<string> GetConnectedFriends(string principalPlayer);
     }
 
