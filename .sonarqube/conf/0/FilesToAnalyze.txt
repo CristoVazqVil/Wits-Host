@@ -1,5 +1,6 @@
 ﻿D:\UV\Tecnologias\WitsHost\WitsClasses\BlockedPlayers.cs
 D:\UV\Tecnologias\WitsHost\WitsClasses\Celebrations.cs
+D:\UV\Tecnologias\WitsHost\WitsClasses\Contracts\IActiveGame.cs
 D:\UV\Tecnologias\WitsHost\WitsClasses\Contracts\IChatManager.cs
 D:\UV\Tecnologias\WitsHost\WitsClasses\Contracts\IConnectedUsers.cs
 D:\UV\Tecnologias\WitsHost\WitsClasses\Contracts\IGameManager.cs

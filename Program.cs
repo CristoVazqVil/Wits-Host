@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 using WitsClasses.Contracts;
 using System.Security.Cryptography;
 
-
 namespace WitsHost
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {

@@ -48,86 +48,35 @@ namespace WitsClasses.Contracts
     [DataContract]
     public class Game
     {
-        private int gameId;
-        private int gameStatus;
-        private string gameLeader;
-        private int numberOfPlayers;
-        private Dictionary<string, int> playerScores;
-        private Dictionary<int, bool> playerReadyToWagerStatus = new Dictionary<int, bool>();
-        private Dictionary<int, bool> playerHasWageredStatus = new Dictionary<int, bool>();
-        private Dictionary<int, bool> playerEnded = new Dictionary<int, bool>();
-        private Dictionary<int, string> playerAnswers;
-        private List<int> questionIds;
+        [DataMember]
+        public int GameId { get; set; }
 
         [DataMember]
-        public int GameId
-        {
-            get { return gameId; }
-            set { gameId = value; }
-        }
+        public int GameStatus { get; set; }
 
         [DataMember]
-        public int GameStatus
-        {
-            get { return gameStatus; }
-            set { gameStatus = value; }
-        }
+        public string GameLeader { get; set; }
 
         [DataMember]
-        public string GameLeader
-        {
-            get { return gameLeader; }
-            set { gameLeader = value; }
-        }
+        public int NumberOfPlayers { get; set; }
 
         [DataMember]
-        public int NumberOfPlayers
-        {
-            get { return numberOfPlayers; }
-            set { numberOfPlayers = value; }
-        }
+        public Dictionary<string, int> PlayerScores { get; set; }
 
         [DataMember]
-        public Dictionary<string, int> PlayerScores
-        {
-            get { return playerScores; }
-            set { playerScores = value; }
-        }
+        public Dictionary<int, bool> PlayerReadyToWagerStatus { get; set; } = new Dictionary<int, bool>();
 
         [DataMember]
-        public Dictionary<int, bool> PlayerReadyToWagerStatus
-        {
-            get { return playerReadyToWagerStatus; }
-            set { playerReadyToWagerStatus = value; }
-        }
+        public Dictionary<int, bool> PlayerHasWageredStatus { get; set; } = new Dictionary<int, bool>();
 
         [DataMember]
-        public Dictionary<int, bool> PlayerHasWageredStatus
-        {
-            get { return playerHasWageredStatus; }
-            set { playerHasWageredStatus = value; }
-        }
+        public Dictionary<int, bool> PlayerEnded { get; set; } = new Dictionary<int, bool>();
 
         [DataMember]
-        public Dictionary<int, bool> PlayerEnded
-        {
-            get { return playerEnded; }
-            set { playerEnded = value; }
-        }
+        public Dictionary<int, string> PlayerAnswers { get; set; }
 
         [DataMember]
-        public Dictionary<int, string> PlayerAnswers
-        {
-            get { return playerAnswers; }
-            set { playerAnswers = value; }
-        }
-
-        [DataMember]
-        public List<int> QuestionIds
-        {
-            get { return questionIds; }
-            set { questionIds = value; }
-        }
+        public List<int> QuestionIds { get; set; }
 
         public Game(int gameId, string gameLeader, int numberOfPlayers)
         {
@@ -139,49 +88,104 @@ namespace WitsClasses.Contracts
             PlayerAnswers = new Dictionary<int, string>();
             QuestionIds = new List<int>();
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            Game other = (Game)obj;
+
+            return GameId == other.GameId &&
+                   GameStatus == other.GameStatus &&
+                   GameLeader == other.GameLeader &&
+                   NumberOfPlayers == other.NumberOfPlayers &&
+                   DictionaryEquals(PlayerScores, other.PlayerScores) &&
+                   DictionaryEquals(PlayerReadyToWagerStatus, other.PlayerReadyToWagerStatus) &&
+                   DictionaryEquals(PlayerHasWageredStatus, other.PlayerHasWageredStatus) &&
+                   DictionaryEquals(PlayerEnded, other.PlayerEnded) &&
+                   DictionaryEquals(PlayerAnswers, other.PlayerAnswers) &&
+                   ListEquals(QuestionIds, other.QuestionIds);
+        }
+
+        private bool DictionaryEquals<TKey, TValue>(Dictionary<TKey, TValue> dict1, Dictionary<TKey, TValue> dict2)
+        {
+            if (dict1 == null && dict2 == null)
+                return true;
+
+            if (dict1 == null || dict2 == null)
+                return false;
+
+            if (dict1.Count != dict2.Count)
+                return false;
+
+            foreach (var kvp in dict1)
+            {
+                if (!dict2.TryGetValue(kvp.Key, out var value) || !EqualityComparer<TValue>.Default.Equals(kvp.Value, value))
+                    return false;
+            }
+
+            return true;
+        }
+
+        private bool ListEquals<T>(List<T> list1, List<T> list2)
+        {
+            if (list1 == null && list2 == null)
+                return true;
+
+            if (list1 == null || list2 == null)
+                return false;
+
+            if (list1.Count != list2.Count)
+                return false;
+
+            return Enumerable.SequenceEqual(list1, list2);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 
     public class Question
     {
-        private string questionES;
-        private string answerES;
-        private string questionEN;
-        private string answerEN;
-        private int trueAnswer;
+        [DataMember]
+        public string QuestionES { get; set; }
 
         [DataMember]
-        public string QuestionES
+        public string AnswerES { get; set; }
+
+        [DataMember]
+        public string QuestionEN { get; set; }
+
+        [DataMember]
+        public string AnswerEN { get; set; }
+
+        [DataMember]
+        public int TrueAnswer { get; set; }
+
+        public override bool Equals(object obj)
         {
-            get { return questionES; }
-            set { questionES = value; }
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            Question other = (Question)obj;
+
+            return string.Equals(QuestionES, other.QuestionES) &&
+                   string.Equals(AnswerES, other.AnswerES) &&
+                   string.Equals(QuestionEN, other.QuestionEN) &&
+                   string.Equals(AnswerEN, other.AnswerEN) &&
+                   TrueAnswer == other.TrueAnswer;
         }
 
-        [DataMember]
-        public string AnswerES
+        public override int GetHashCode()
         {
-            get { return answerES; }
-            set { answerES = value; }
-        }
-
-        [DataMember]
-        public string QuestionEN
-        {
-            get { return questionEN; }
-            set { questionEN = value; }
-        }
-
-        [DataMember]
-        public string AnswerEN
-        {
-            get { return answerEN; }
-            set { answerEN = value; }
-        }
-
-        [DataMember]
-        public int TrueAnswer
-        {
-            get { return trueAnswer; }
-            set { trueAnswer = value; }
+            return base.GetHashCode();
         }
     }
 }

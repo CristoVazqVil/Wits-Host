@@ -21,9 +21,6 @@ namespace WitsClasses.Contracts
 
         [OperationContract(IsOneWay = true)]
         void UnregisterUserContext(string username);
-
-      
-
     }
 
     [ServiceContract]
@@ -34,7 +31,5 @@ namespace WitsClasses.Contracts
 
         [OperationContract]
         void StartGamePage();
-
-
     }
 }
