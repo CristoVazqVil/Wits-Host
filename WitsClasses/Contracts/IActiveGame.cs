@@ -36,8 +36,10 @@ namespace WitsClasses.Contracts
         void GameEnded(int gameId, int playerNumber, bool isRegistered);
 
         [OperationContract(IsOneWay = true)]
-        void WhoWon(int gameId,int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture);
+        void WhoWon(int gameId, int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture);
 
+        [OperationContract(IsOneWay = true)]
+        void UpdateHighestScore(string userInGame, Dictionary<string, object> winnerInfo);
 
         [OperationContract(IsOneWay = true)]
         void ShowWinner(int gameId);
