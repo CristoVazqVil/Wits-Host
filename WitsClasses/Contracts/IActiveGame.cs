@@ -24,7 +24,7 @@ namespace WitsClasses.Contracts
         void SavePlayerAnswer(int playerNumber, string answer, int gameId);
 
         [OperationContract(IsOneWay = true)]
-        void ReceivePlayerSelectedAnswer(int playerNumber, int selectedAnswer,int idProfilePicture, int gameId);
+        void ReceivePlayerSelectedAnswer(Dictionary<string, object> answersInfo);
 
         [OperationContract(IsOneWay = true)]
         void ReadyToWager(int gameId, int playerNumber, bool isReady);
