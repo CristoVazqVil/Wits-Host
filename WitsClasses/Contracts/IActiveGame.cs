@@ -36,7 +36,7 @@ namespace WitsClasses.Contracts
         void GameEnded(int gameId, int playerNumber, bool isRegistered);
 
         [OperationContract(IsOneWay = true)]
-        void WhoWon(int gameId, int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture);
+        void WhoWon(Dictionary<string, object> gameEndInfo);
 
         [OperationContract(IsOneWay = true)]
         void UpdateHighestScore(string userInGame, Dictionary<string, object> winnerInfo);

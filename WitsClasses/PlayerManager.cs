@@ -1612,14 +1612,21 @@ namespace WitsClasses
             }
         }
 
-        public void WhoWon(int gameId, int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture)
+        public void WhoWon(Dictionary<string, object> gameEndInfo)
         {
             OperationContext currentContext = OperationContext.Current;
 
-            if (currentContext == null)
+            if (currentContext == null || !gameEndInfo.ContainsKey("gameId") || !gameEndInfo.ContainsKey("player"))
             {
                 return;
             }
+
+            int gameId = (int)gameEndInfo["gameId"];
+            int numberPlayer = (int)gameEndInfo["player"];
+            string userName = gameEndInfo.ContainsKey("userName") ? (string)gameEndInfo["userName"] : "";
+            int idCelebration = gameEndInfo.ContainsKey("celebrationId") ? (int)gameEndInfo["celebrationId"] : 0;
+            int score = gameEndInfo.ContainsKey("score") ? (int)gameEndInfo["score"] : 0;
+            int idProfilePicture = gameEndInfo.ContainsKey("profilePictureId") ? (int)gameEndInfo["profilePictureId"] : 0;
 
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
             if (game != null)
@@ -1628,15 +1635,14 @@ namespace WitsClasses
 
                 foreach (string userInGame in playerIds)
                 {
-
                     Dictionary<string, object> playerInfo = new Dictionary<string, object>
-                    {
-                        { "NumberPlayer", numberPlayer },
-                        { "UserName", userName },
-                        { "IdCelebration", idCelebration },
-                        { "Score", score },
-                        { "IdProfilePicture", idProfilePicture }
-                    };
+            {
+                { "NumberPlayer", numberPlayer },
+                { "UserName", userName },
+                { "IdCelebration", idCelebration },
+                { "Score", score },
+                { "IdProfilePicture", idProfilePicture }
+            };
 
                     try
                     {
