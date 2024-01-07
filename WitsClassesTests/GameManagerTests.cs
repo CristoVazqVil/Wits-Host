@@ -42,6 +42,20 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        public void JoinGameFailedInvalid()
+        {
+            // Arrange
+            PlayerManager manager = new PlayerManager();
+            int expected = 0;
+
+            // Act
+            int result = manager.JoinGame(0, "");
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
         public void JoinGameFailedFull()
         {
             // Arrange
@@ -107,6 +121,20 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        public void RemovePlayerInGameFailedInvalid()
+        {
+            // Arrange
+            PlayerManager manager = new PlayerManager();
+            int expected = 0;
+
+            // Act
+            int result = manager.RemovePlayerInGame(0, "");
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
         public void GetPlayerScoreSuccess()
         {
             // Arrange
@@ -153,6 +181,21 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        public void GetPlayerScoreFailedInvalid()
+        {
+            // Arrange
+            PlayerManager manager = new PlayerManager();
+            manager.CreateGame(12345, "CrisCris");
+            int expected = 0;
+
+            // Act
+            int result = manager.GetPlayerScore(0, "");
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
         public void GetGameLeaderSuccess()
         {
             // Arrange
@@ -177,6 +220,21 @@ namespace WitsClassesTests
 
             // Act
             string result = manager.GetGameLeader(77777);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void GetGameLeaderFailedInvalid()
+        {
+            // Arrange
+            PlayerManager manager = new PlayerManager();
+            manager.CreateGame(12345, "CrisCris");
+            string expected = null;
+
+            // Act
+            string result = manager.GetGameLeader(0);
 
             // Assert
             Assert.AreEqual(expected, result);
@@ -218,12 +276,27 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        public void GetQuestionByIdFailedInvalid()
+        {
+            // Arrange
+            PlayerManager manager = new PlayerManager();
+            Question expectedQuestion = new Question();
+            int questionToGet = 0;
+
+            // Act
+            Question result = manager.GetQuestionByID(questionToGet);
+
+            // Assert
+            Assert.AreEqual(expectedQuestion, result);
+        }
+
+        [TestMethod]
         public void GetQuestionByIdException()
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
             Question expectedQuestion = new Question();
-            int questionToGet = 5;
+            int questionToGet = 89705;
 
             // Act
             Question result = manager.GetQuestionByID(questionToGet);

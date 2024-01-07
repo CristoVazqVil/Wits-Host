@@ -40,10 +40,10 @@ namespace WitsClassesTests.WitsService {
         System.Threading.Tasks.Task SavePlayerAnswerAsync(int playerNumber, string answer, int gameId);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IActiveGame/ReceivePlayerSelectedAnswer")]
-        void ReceivePlayerSelectedAnswer(int playerNumber, int selectedAnswer, int idProfilePicture, int gameId);
+        void ReceivePlayerSelectedAnswer(System.Collections.Generic.Dictionary<string, object> answersInfo);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IActiveGame/ReceivePlayerSelectedAnswer")]
-        System.Threading.Tasks.Task ReceivePlayerSelectedAnswerAsync(int playerNumber, int selectedAnswer, int idProfilePicture, int gameId);
+        System.Threading.Tasks.Task ReceivePlayerSelectedAnswerAsync(System.Collections.Generic.Dictionary<string, object> answersInfo);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IActiveGame/ReadyToWager")]
         void ReadyToWager(int gameId, int playerNumber, bool isReady);
@@ -64,10 +64,10 @@ namespace WitsClassesTests.WitsService {
         System.Threading.Tasks.Task GameEndedAsync(int gameId, int playerNumber, bool isRegistered);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IActiveGame/WhoWon")]
-        void WhoWon(int gameId, int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture);
+        void WhoWon(System.Collections.Generic.Dictionary<string, object> gameEndInfo);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IActiveGame/WhoWon")]
-        System.Threading.Tasks.Task WhoWonAsync(int gameId, int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture);
+        System.Threading.Tasks.Task WhoWonAsync(System.Collections.Generic.Dictionary<string, object> gameEndInfo);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/IActiveGame/ShowWinner")]
         void ShowWinner(int gameId);
@@ -101,7 +101,7 @@ namespace WitsClassesTests.WitsService {
         void BeExpelled();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IActiveGame/ShowVictoryScreen", ReplyAction="http://tempuri.org/IActiveGame/ShowVictoryScreenResponse")]
-        void ShowVictoryScreen(string userName, int profilePictureId, int celebrationId, int score);
+        void ShowVictoryScreen(System.Collections.Generic.Dictionary<string, object> winnerInfo);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IActiveGame/TieBreaker", ReplyAction="http://tempuri.org/IActiveGame/TieBreakerResponse")]
         void TieBreaker();
@@ -167,12 +167,12 @@ namespace WitsClassesTests.WitsService {
             return base.Channel.SavePlayerAnswerAsync(playerNumber, answer, gameId);
         }
         
-        public void ReceivePlayerSelectedAnswer(int playerNumber, int selectedAnswer, int idProfilePicture, int gameId) {
-            base.Channel.ReceivePlayerSelectedAnswer(playerNumber, selectedAnswer, idProfilePicture, gameId);
+        public void ReceivePlayerSelectedAnswer(System.Collections.Generic.Dictionary<string, object> answersInfo) {
+            base.Channel.ReceivePlayerSelectedAnswer(answersInfo);
         }
         
-        public System.Threading.Tasks.Task ReceivePlayerSelectedAnswerAsync(int playerNumber, int selectedAnswer, int idProfilePicture, int gameId) {
-            return base.Channel.ReceivePlayerSelectedAnswerAsync(playerNumber, selectedAnswer, idProfilePicture, gameId);
+        public System.Threading.Tasks.Task ReceivePlayerSelectedAnswerAsync(System.Collections.Generic.Dictionary<string, object> answersInfo) {
+            return base.Channel.ReceivePlayerSelectedAnswerAsync(answersInfo);
         }
         
         public void ReadyToWager(int gameId, int playerNumber, bool isReady) {
@@ -199,12 +199,12 @@ namespace WitsClassesTests.WitsService {
             return base.Channel.GameEndedAsync(gameId, playerNumber, isRegistered);
         }
         
-        public void WhoWon(int gameId, int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture) {
-            base.Channel.WhoWon(gameId, numberPlayer, userName, idCelebration, score, idProfilePicture);
+        public void WhoWon(System.Collections.Generic.Dictionary<string, object> gameEndInfo) {
+            base.Channel.WhoWon(gameEndInfo);
         }
         
-        public System.Threading.Tasks.Task WhoWonAsync(int gameId, int numberPlayer, string userName, int idCelebration, int score, int idProfilePicture) {
-            return base.Channel.WhoWonAsync(gameId, numberPlayer, userName, idCelebration, score, idProfilePicture);
+        public System.Threading.Tasks.Task WhoWonAsync(System.Collections.Generic.Dictionary<string, object> gameEndInfo) {
+            return base.Channel.WhoWonAsync(gameEndInfo);
         }
         
         public void ShowWinner(int gameId) {
@@ -341,6 +341,12 @@ namespace WitsClassesTests.WitsService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IPlayerManager/UpdateCelebration", ReplyAction="http://tempuri.org/IPlayerManager/UpdateCelebrationResponse")]
         System.Threading.Tasks.Task<bool> UpdateCelebrationAsync(string username, int celebrationId);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IPlayerManager/UpdateHighestScore", ReplyAction="http://tempuri.org/IPlayerManager/UpdateHighestScoreResponse")]
+        int UpdateHighestScore(string userInGame, System.Collections.Generic.Dictionary<string, object> winnerInfo);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IPlayerManager/UpdateHighestScore", ReplyAction="http://tempuri.org/IPlayerManager/UpdateHighestScoreResponse")]
+        System.Threading.Tasks.Task<int> UpdateHighestScoreAsync(string userInGame, System.Collections.Generic.Dictionary<string, object> winnerInfo);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -520,6 +526,14 @@ namespace WitsClassesTests.WitsService {
         
         public System.Threading.Tasks.Task<bool> UpdateCelebrationAsync(string username, int celebrationId) {
             return base.Channel.UpdateCelebrationAsync(username, celebrationId);
+        }
+        
+        public int UpdateHighestScore(string userInGame, System.Collections.Generic.Dictionary<string, object> winnerInfo) {
+            return base.Channel.UpdateHighestScore(userInGame, winnerInfo);
+        }
+        
+        public System.Threading.Tasks.Task<int> UpdateHighestScoreAsync(string userInGame, System.Collections.Generic.Dictionary<string, object> winnerInfo) {
+            return base.Channel.UpdateHighestScoreAsync(userInGame, winnerInfo);
         }
     }
     

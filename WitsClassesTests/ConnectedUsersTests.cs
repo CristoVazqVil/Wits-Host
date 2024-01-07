@@ -36,7 +36,7 @@ namespace WitsClassesTests
         }
 
         [Fact]
-        public async void UpdateConnectedFriendsException()
+        public async void UpdateConnectedFriendsNotCalled()
         {
             proxyConnectedUsers.RemoveConnectedUser("Test");
 

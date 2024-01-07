@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using WitsClasses;
@@ -180,7 +181,7 @@ namespace WitsClassesTests
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
-            Player expectedPlayer = null;
+            Player expectedPlayer = new Player();
             string playerToGet = "NotExistingPlayer";
 
             // Act
@@ -210,8 +211,8 @@ namespace WitsClassesTests
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
-            Player expectedPlayer = null;
-            string playerToGet = "CrisCris";
+            Player expectedPlayer = new Player();
+            string playerToGet = "nope";
 
             // Act
             Player result = manager.GetPlayerByUser(playerToGet);
@@ -247,8 +248,8 @@ namespace WitsClassesTests
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
-            Player expectedPlayer = null;
-            string playerToGet = "UnitTest";
+            Player expectedPlayer = new Player();
+            string playerToGet = "UnitTest6799";
             string userPassword = "password";
 
             // Act
@@ -295,9 +296,9 @@ namespace WitsClassesTests
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
-            Player expectedPlayer = null;
+            Player expectedPlayer = new Player();
             string playerToGet = "UnitTest";
-            string userPassword = "UnitPassword";
+            string userPassword = "UnitPassword6788";
 
             // Act
             Player result = manager.GetPlayerByUserAndPassword(playerToGet, userPassword);
@@ -1257,6 +1258,22 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        public void UpdateCelebrationFailedInvalid()
+        {
+            // Arrange
+            PlayerManager manager = new PlayerManager();
+            bool expected = false;
+            string player = "";
+            int celebrationId = 0;
+
+            // Act
+            bool result = manager.UpdateCelebration(player, celebrationId);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
         public void UpdateCelebrationFailedBothNotExisting()
         {
             // Arrange
@@ -1283,6 +1300,86 @@ namespace WitsClassesTests
 
             // Act
             bool result = manager.UpdateCelebration(player, celebrationId);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void UpdateHighestScoreSuccess()
+        {
+            // Arrange
+            PlayerManager manager = new PlayerManager();
+            int expected = 1;
+            string userInGame = "PruebaAmigo";
+            Dictionary<string, object> winnerInfo = new Dictionary<string, object>
+            {
+                { "UserName", "PruebaAmigo" },
+                { "Score", 200 }
+            };
+
+            // Act
+            int result = manager.UpdateHighestScore(userInGame, winnerInfo);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void UpdateHighestScoreFailedNotExisting()
+        {
+            // Arrange
+            PlayerManager manager = new PlayerManager();
+            int expected = 0;
+            string userInGame = "tes6348";
+            Dictionary<string, object> winnerInfo = new Dictionary<string, object>
+            {
+                { "UserName", "test7493" },
+                { "Score", 100 }
+            };
+
+            // Act
+            int result = manager.UpdateHighestScore(userInGame, winnerInfo);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void UpdateHighestScoreFailedInvalid()
+        {
+            // Arrange
+            PlayerManager manager = new PlayerManager();
+            int expected = 0;
+            string userInGame = "PruebaAmigo";
+            Dictionary<string, object> winnerInfo = new Dictionary<string, object>
+            {
+                { "UserName", "PruebaAmigo" },
+                { "Score", 5 }
+            };
+
+            // Act
+            int result = manager.UpdateHighestScore(userInGame, winnerInfo);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void UpdateHighestScoreException()
+        {
+            // Arrange
+            PlayerManager manager = new PlayerManager();
+            int expected = 0;
+            string userInGame = "Notttttt";
+            Dictionary<string, object> winnerInfo = new Dictionary<string, object>
+            {
+                { "UserName", "nope" },
+                { "Score", 5 }
+            };
+
+            // Act
+            int result = manager.UpdateHighestScore(userInGame, winnerInfo);
 
             // Assert
             Assert.AreEqual(expected, result);

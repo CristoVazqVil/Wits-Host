@@ -70,7 +70,7 @@ namespace WitsClasses.Contracts
         bool UpdateCelebration(string username, int celebrationId);
 
         [OperationContract]
-        void UpdateHighestScore(string userInGame, Dictionary<string, object> winnerInfo);
+        int UpdateHighestScore(string userInGame, Dictionary<string, object> winnerInfo);
     }
 
     [DataContract]

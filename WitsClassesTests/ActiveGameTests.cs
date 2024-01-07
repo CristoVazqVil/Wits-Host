@@ -4,6 +4,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using WitsClasses;
 using WitsClassesTests.WitsService;
 using Xunit;
 
@@ -109,6 +110,53 @@ namespace WitsClassesTests
             await Task.Delay(2000);
             Assert.False(activeGameCallbackImplementation.IsCalled);
         }
+
+
+        [Fact]
+        public async void ShowVictoryScreenNotCalled()
+        {
+            proxyActiveGame.UnregisterUserInGameContext("CrisCris");
+
+            await Task.Delay(2000);
+            Assert.False(activeGameCallbackImplementation.IsCalled);
+        }
+
+
+        [Fact]
+        public async void TieBreakerNotCalled()
+        {
+            proxyActiveGame.UnregisterUserInGameContext("CrisCris");
+
+            await Task.Delay(2000);
+            Assert.False(activeGameCallbackImplementation.IsCalled);
+        }
+
+        [Fact]
+        public async void UpdateSelectionSuccess()
+        {
+            proxyActiveGame.SavePlayerAnswer(1, "Answer", 12345);
+            Dictionary<string, object> answersInfo = new Dictionary<string, object>
+            {
+                { "playerNumber", 1 },
+                { "selectedAnswer", 1 },
+                { "profilePictureId", 1 },
+                { "gameId", 12345 }
+            };
+
+            proxyActiveGame.ReceivePlayerSelectedAnswer(answersInfo);
+
+            await Task.Delay(2000);
+            Assert.True(activeGameCallbackImplementation.IsCalled);
+        }
+
+        [Fact]
+        public async void UpdateSelectionNotCalled()
+        {
+            proxyActiveGame.UnregisterUserInGameContext("CrisCris");
+
+            await Task.Delay(2000);
+            Assert.False(activeGameCallbackImplementation.IsCalled);
+        }
     }
 
     public class ActiveGameCallbackImplementation : IActiveGameCallback
@@ -145,7 +193,7 @@ namespace WitsClassesTests
             IsCalled = true;
         }
 
-        public void ShowVictoryScreen(string userName, int profilePictureId, int celebrationId, int score)
+        public void ShowVictoryScreen(Dictionary<string, object> winnerInfo)
         {
             IsCalled = true;
         }

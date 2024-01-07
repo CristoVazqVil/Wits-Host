@@ -1530,7 +1530,6 @@ namespace WitsClasses
                     {
                         witslogger.Error(ex);
                     }
-
                 }
             }
         }
@@ -1751,51 +1750,76 @@ namespace WitsClasses
 
         public void HandleWinnerInfo(List<Dictionary<string, object>> winnersInfo, string userInGame)
         {
-            if (winnersInfo.Count > 1)
+            try
             {
-                usersInGameContexts[userInGame].TieBreaker();
-            }
-
-            if (winnersInfo.Count < 2)
-            {
-                var winnerInfo = winnersInfo[0];
-
-                usersInGameContexts[userInGame].ShowVictoryScreen(winnerInfo);
-
-                UpdateHighestScore(userInGame, winnerInfo);
-            }
-        }
-
-        public void UpdateHighestScore(string userInGame, Dictionary<string, object> winnerInfo)
-        {
-            using (var context = new WitsAndWagersEntities())
-            {
-                context.Database.Log = Console.WriteLine;
-
-                string username = (string)winnerInfo["UserName"];
-
-                var player = context.Players.Find(username);
-
-                if (player != null)
+                if (winnersInfo.Count > 1)
                 {
-                    Player highestScorePlayer = new Player
-                    {
-                        HighestScore = (int)player.highestScore,
-                    };
+                    usersInGameContexts[userInGame].TieBreaker();
+                }
 
-                    if (highestScorePlayer.HighestScore < (int)winnerInfo["Score"])
-                    {
-                        context.Database.Log = Console.WriteLine;
+                if (winnersInfo.Count < 2)
+                {
+                    var winnerInfo = winnersInfo[0];
 
-                        player.highestScore = (int)winnerInfo["Score"];
-                        context.SaveChanges();
-                    }
+                    usersInGameContexts[userInGame].ShowVictoryScreen(winnerInfo);
+
+                    UpdateHighestScore(userInGame, winnerInfo);
                 }
             }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                witslogger.Error(ex);
+            }
+        }
+
+        public int UpdateHighestScore(string userInGame, Dictionary<string, object> winnerInfo)
+        {
+            int returnValue = 0;
+
+            using (var context = new WitsAndWagersEntities())
+            {
+                try
+                {
+                    context.Database.Log = Console.WriteLine;
+
+                    string username = (string)winnerInfo["UserName"];
+
+                    var player = context.Players.Find(username);
+
+                    if (player != null)
+                    {
+                        Player highestScorePlayer = new Player
+                        {
+                            HighestScore = (int)player.highestScore,
+                        };
+
+                        if (highestScorePlayer.HighestScore < (int)winnerInfo["Score"])
+                        {
+                            context.Database.Log = Console.WriteLine;
+
+                            player.highestScore = (int)winnerInfo["Score"];
+                            returnValue = context.SaveChanges();
+                        }
+                    }
+                }
+                catch (DataException ex)
+                {
+                    witslogger.Error(ex);
+                    returnValue = 0;
+                }
+                catch (SqlException ex)
+                {
+                    witslogger.Error(ex);
+                    returnValue = 0;
+                }
+
+            }
+
+            return returnValue;
         }
 
 
-       
+
 
         public void GameEnded(int gameId, int playerNumber, bool isRegistered)
         {
