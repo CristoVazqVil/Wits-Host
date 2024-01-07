@@ -15,6 +15,7 @@ using System.Windows;
 using System.Runtime.Remoting.Messaging;
 using System.Security.Cryptography;
 using System.Media;
+using System.CodeDom;
 
 
 namespace WitsClasses
@@ -1211,7 +1212,7 @@ namespace WitsClasses
                 {
                     witslogger.Error(ex);
                 }
-                
+
             }
         }
 
@@ -1264,7 +1265,7 @@ namespace WitsClasses
 
             while (questionIds.Count < 80)
             {
-                int newQuestionId = randomNum.Next(1, 150); 
+                int newQuestionId = randomNum.Next(1, 150);
 
                 if (!questionIds.Contains(newQuestionId))
                 {
@@ -1287,7 +1288,7 @@ namespace WitsClasses
             {
                 return new List<int>();
             }
-            
+
         }
 
         public void StartGame(int gameId)
@@ -1304,7 +1305,7 @@ namespace WitsClasses
             {
                 List<int> questionIds = GenerateRandomQuestionIds();
                 List<string> playerIds = FilterPlayersByGame(game, gameId);
-                
+
                 game.QuestionIds = questionIds;
                 game.GameStatus = 1;
 
@@ -1362,7 +1363,7 @@ namespace WitsClasses
                 {
                     witslogger.Error(ex);
                 }
-                
+
             }
         }
 
@@ -1650,6 +1651,7 @@ namespace WitsClasses
             }
         }
 
+
         public void ShowWinner(int gameId)
         {
             OperationContext currentContext = OperationContext.Current;
@@ -1659,24 +1661,7 @@ namespace WitsClasses
                 return;
             }
 
-            int maxScore = int.MinValue;
-            List<Dictionary<string, object>> winnersInfo = new List<Dictionary<string, object>>();
-
-            foreach (var playerInfo in PlayersFinalScores.Values)
-            {
-                int score = (int)((Dictionary<string, object>)playerInfo)["Score"];
-
-                if (score > maxScore)
-                {
-                    maxScore = score;
-                    winnersInfo.Clear();
-                    winnersInfo.Add((Dictionary<string, object>)playerInfo);
-                }
-                else if (score == maxScore)
-                {
-                    winnersInfo.Add((Dictionary<string, object>)playerInfo);
-                }
-            }
+            List<Dictionary<string, object>> winnersInfo = FindWinners();
 
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
 
@@ -1688,63 +1673,7 @@ namespace WitsClasses
                 {
                     try
                     {
-                        if (winnersInfo.Count > 1)
-                        {
-                            usersInGameContexts[userInGame].TieBreaker();
-                        }
-
-                        if (winnersInfo.Count < 2)
-                        {
-                            usersInGameContexts[userInGame].ShowVictoryScreen(
-                                (string)winnersInfo[0]["UserName"],
-                                (int)winnersInfo[0]["IdProfilePicture"],
-                                (int)winnersInfo[0]["IdCelebration"],
-                                (int)winnersInfo[0]["Score"]
-                            );
-
-                            using (var context = new WitsAndWagersEntities())
-                            {
-                                context.Database.Log = Console.WriteLine;
-                                try
-                                {
-                                    foreach (var winnerInfo in winnersInfo)
-                                    {
-                                        string username = (string)winnerInfo["UserName"];
-
-                                        var player = context.Players.Find(username);
-
-                                        if (player != null)
-                                        {
-                                            Player highestScorePlayer = new Player
-                                            {
-                                                HighestScore = (int)player.highestScore,
-                                            };
-
-
-                                            if (highestScorePlayer.HighestScore < (int)winnerInfo["Score"])
-                                            {
-                                                context.Database.Log = Console.WriteLine;
-
-                                                player.highestScore = (int)winnerInfo["Score"];
-                                                context.SaveChanges();
-                                            }
-                                        }
-                                    }
-                                }
-                                catch (EntityException ex)
-                                {
-                                    witslogger.Error(ex);
-                                }
-                                catch (DataException ex)
-                                {
-                                    witslogger.Error(ex);
-                                }
-                                catch (SqlException ex)
-                                {
-                                    witslogger.Error(ex);
-                                }
-                            }
-                        }
+                        HandleWinnerInfo(winnersInfo, userInGame);
                     }
                     catch (TimeoutException ex)
                     {
@@ -1766,14 +1695,100 @@ namespace WitsClasses
                     {
                         witslogger.Error(ex);
                     }
+
                 }
             }
 
             winnersInfo.Clear();
+            ClearDictionaries();
+        }
+
+
+        public void ClearDictionaries()
+        {
             PlayersFinalScores.Clear();
             playerAnswers.Clear();
             playerSelectedAnswers.Clear();
+
         }
+
+
+        public List<Dictionary<string, object>> FindWinners()
+        {
+            int maxScore = int.MinValue;
+            List<Dictionary<string, object>> winnersInfo = new List<Dictionary<string, object>>();
+
+            foreach (var playerInfo in PlayersFinalScores.Values)
+            {
+                int score = (int)((Dictionary<string, object>)playerInfo)["Score"];
+
+                if (score > maxScore)
+                {
+                    maxScore = score;
+                    winnersInfo.Clear();
+                    winnersInfo.Add((Dictionary<string, object>)playerInfo);
+                }
+                else if (score == maxScore)
+                {
+                    winnersInfo.Add((Dictionary<string, object>)playerInfo);
+                }
+            }
+
+            return winnersInfo;
+        }
+
+        public void HandleWinnerInfo(List<Dictionary<string, object>> winnersInfo, string userInGame)
+        {
+            if (winnersInfo.Count > 1)
+            {
+                usersInGameContexts[userInGame].TieBreaker();
+            }
+
+            if (winnersInfo.Count < 2)
+            {
+                var winnerInfo = winnersInfo[0];
+
+                usersInGameContexts[userInGame].ShowVictoryScreen(
+                    (string)winnerInfo["UserName"],
+                    (int)winnerInfo["IdProfilePicture"],
+                    (int)winnerInfo["IdCelebration"],
+                    (int)winnerInfo["Score"]
+                );
+
+                UpdateHighestScore(userInGame, winnerInfo);
+            }
+        }
+
+        public void UpdateHighestScore(string userInGame, Dictionary<string, object> winnerInfo)
+        {
+            using (var context = new WitsAndWagersEntities())
+            {
+                context.Database.Log = Console.WriteLine;
+
+                string username = (string)winnerInfo["UserName"];
+
+                var player = context.Players.Find(username);
+
+                if (player != null)
+                {
+                    Player highestScorePlayer = new Player
+                    {
+                        HighestScore = (int)player.highestScore,
+                    };
+
+                    if (highestScorePlayer.HighestScore < (int)winnerInfo["Score"])
+                    {
+                        context.Database.Log = Console.WriteLine;
+
+                        player.highestScore = (int)winnerInfo["Score"];
+                        context.SaveChanges();
+                    }
+                }
+            }
+        }
+
+
+       
 
         public void GameEnded(int gameId, int playerNumber, bool isRegistered)
         {

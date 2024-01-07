@@ -19,7 +19,9 @@ namespace WitsHost
                 Console.WriteLine("Wits And Wagers is running");
 
                 Console.ReadLine();
+
             }
+           
         }
     }
 }
