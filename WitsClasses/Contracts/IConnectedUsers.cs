@@ -22,6 +22,9 @@ namespace WitsClasses.Contracts
         void RemoveFromEverywhere(string user);
 
         [OperationContract]
+        void UpdateFriendsForAll();
+
+        [OperationContract]
         List<string> GetConnectedFriends(string principalPlayer);
     }
 

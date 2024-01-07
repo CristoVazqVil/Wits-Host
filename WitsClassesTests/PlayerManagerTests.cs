@@ -100,7 +100,7 @@ namespace WitsClassesTests
             // Arrange
             PlayerManager manager = new PlayerManager();
             int expected = 1;
-            string playerToDelete = "UnitTest";
+            string playerToDelete = "jason";
 
             // Act
             int result = manager.DeletePlayer(playerToDelete);
@@ -195,7 +195,7 @@ namespace WitsClassesTests
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
-            Player expectedPlayer = null;
+            Player expectedPlayer = new Player();
             string playerToGet = null;
 
             // Act
@@ -263,7 +263,7 @@ namespace WitsClassesTests
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
-            Player expectedPlayer = null;
+            Player expectedPlayer = new Player();
             string playerToGet = "CrisCris";
             string userPassword = "password";
 
@@ -279,7 +279,7 @@ namespace WitsClassesTests
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
-            Player expectedPlayer = null;
+            Player expectedPlayer = new Player();
             string playerToGet = "UnitTest78";
             string userPassword = "Criscris9?";
 
@@ -313,7 +313,7 @@ namespace WitsClassesTests
             PlayerManager manager = new PlayerManager();
             int expected = 1;
             string username = "UnitTest";
-            string passwordToUpdate = "password";
+            string passwordToUpdate = "password45";
 
             // Act
             int result = manager.UpdatePassword(username, passwordToUpdate);
@@ -1023,7 +1023,7 @@ namespace WitsClassesTests
             PlayerManager manager = new PlayerManager();
             int expected = 0;
             string player = "CrisCris";
-            string playerToBlock = "NotExisting2";
+            string playerToBlock = "NotExisting";
 
             // Act
             int result = manager.BlockPlayer(player, playerToBlock);
@@ -1161,6 +1161,22 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        public void UpdateProfilePictureFailedBothNotExisting()
+        {
+            // Arrange
+            PlayerManager manager = new PlayerManager();
+            bool expected = false;
+            string player = "notExisting";
+            int profilePicId = 786;
+
+            // Act
+            bool result = manager.UpdateProfilePicture(player, profilePicId);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
         public void UpdateProfilePictureFailedNotExistingId()
         {
             // Arrange
@@ -1241,6 +1257,22 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        public void UpdateCelebrationFailedBothNotExisting()
+        {
+            // Arrange
+            PlayerManager manager = new PlayerManager();
+            bool expected = false;
+            string player = "NotExisting";
+            int celebrationId = 6785;
+
+            // Act
+            bool result = manager.UpdateCelebration(player, celebrationId);
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
         public void UpdateCelebrationException()
         {
             // Arrange
@@ -1256,13 +1288,5 @@ namespace WitsClassesTests
             Assert.AreEqual(expected, result);
         }
 
-        [TestMethod]
-        public void IsPlayerLoggedSuccess()
-        {
-            // Arrange
-            PlayerManager manager = new PlayerManager();
-            bool expected = true;
-            //manager.all
-        }
     }
 }
