@@ -1442,8 +1442,15 @@ namespace WitsClasses
             }
         }
 
-        public void ReceivePlayerSelectedAnswer(int playerNumber, int selectedAnswer, int idProfilePicture, int gameId)
+        public void ReceivePlayerSelectedAnswer(Dictionary<string, object> answersInfo)
         {
+
+            int playerNumber = (int)answersInfo["playerNumber"];
+            int selectedAnswer = (int)answersInfo["selectedAnswer"];
+            int idProfilePicture = (int)answersInfo["profilePictureId"];
+            int gameId = (int)answersInfo["gameId"];
+
+
             playerSelectedAnswers[playerNumber] = new PlayerSelectedAnswer { SelectedAnswer = selectedAnswer, IdProfilePicture = idProfilePicture };
 
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
