@@ -66,7 +66,7 @@ namespace WitsClasses.Contracts
         void BeExpelled();
 
         [OperationContract]
-        void ShowVictoryScreen(string userName, int profilePictureId, int celebrationId, int score);
+        void ShowVictoryScreen(Dictionary<string, object> winnerInfo);
 
         [OperationContract]
         void TieBreaker();

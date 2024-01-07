@@ -1760,12 +1760,7 @@ namespace WitsClasses
             {
                 var winnerInfo = winnersInfo[0];
 
-                usersInGameContexts[userInGame].ShowVictoryScreen(
-                    (string)winnerInfo["UserName"],
-                    (int)winnerInfo["IdProfilePicture"],
-                    (int)winnerInfo["IdCelebration"],
-                    (int)winnerInfo["Score"]
-                );
+                usersInGameContexts[userInGame].ShowVictoryScreen(winnerInfo);
 
                 UpdateHighestScore(userInGame, winnerInfo);
             }
