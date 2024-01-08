@@ -1246,10 +1246,6 @@ namespace WitsClasses
                         witslogger.Error(ex);
                         RemoveFromEverywhere(userInGame);
                     }
-                    catch (InvalidOperationException ex)
-                    {
-                        witslogger.Error(ex);
-                    }
                     catch (KeyNotFoundException ex)
                     {
                         witslogger.Error(ex);
@@ -1522,10 +1518,6 @@ namespace WitsClasses
                         RemoveFromEverywhere(userInGame);
                         RemovePlayerInGame(gameId, userInGame);
                     }
-                    catch (InvalidOperationException ex)
-                    {
-                        witslogger.Error(ex);
-                    }
                     catch (KeyNotFoundException ex)
                     {
                         witslogger.Error(ex);
@@ -1697,10 +1689,6 @@ namespace WitsClasses
                         witslogger.Error(ex);
                         RemoveFromEverywhere(userInGame);
                         RemovePlayerInGame(gameId, userInGame);
-                    }
-                    catch (InvalidOperationException ex)
-                    {
-                        witslogger.Error(ex);
                     }
                     catch (KeyNotFoundException ex)
                     {

@@ -1,0 +1,27 @@
+﻿D:\UV\Tecnologias\WitsHost\WitsClassesTests\ActiveGameTests.cs
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\ChatManagerTests.cs
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\ConnectedUsersTests.cs
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\GameManagerTests.cs
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\PlayerManagerTests.cs
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\Properties\AssemblyInfo.cs
+D:\UV\Tecnologias\WitsHost\packages\xunit.runner.visualstudio.2.5.6\build\net462\xunit.runner.visualstudio.testadapter.dll
+D:\UV\Tecnologias\WitsHost\packages\xunit.runner.visualstudio.2.5.6\build\net462\xunit.abstractions.dll
+D:\UV\Tecnologias\WitsHost\packages\xunit.runner.visualstudio.2.5.6\build\net462\xunit.runner.reporters.net452.dll
+D:\UV\Tecnologias\WitsHost\packages\xunit.runner.visualstudio.2.5.6\build\net462\xunit.runner.utility.net452.dll
+D:\UV\Tecnologias\WitsHost\packages\MSTest.TestAdapter.2.2.10\build\_common\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
+D:\UV\Tecnologias\WitsHost\packages\MSTest.TestAdapter.2.2.10\build\_common\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
+D:\UV\Tecnologias\WitsHost\packages\MSTest.TestAdapter.2.2.10\build\net46\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
+D:\UV\Tecnologias\WitsHost\packages\MSTest.TestAdapter.2.2.10\build\net46\Microsoft.TestPlatform.AdapterUtilities.dll
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\App.config
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\Connected Services\WitsService\item.xsd
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\Connected Services\WitsService\item1.xsd
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\Connected Services\WitsService\item2.xsd
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\Connected Services\WitsService\item3.xsd
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\Connected Services\WitsService\PlayerManager.wsdl
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\packages.config
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\Properties\DataSources\WitsClasses.Contracts.Player.datasource
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\Properties\DataSources\WitsClasses.Contracts.Question.datasource
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\Connected Services\WitsService\item.disco
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\Connected Services\WitsService\configuration91.svcinfo
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\Connected Services\WitsService\configuration.svcinfo
+D:\UV\Tecnologias\WitsHost\WitsClassesTests\Connected Services\WitsService\Reference.svcmap
