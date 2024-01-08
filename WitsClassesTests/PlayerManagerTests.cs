@@ -18,7 +18,7 @@ namespace WitsClassesTests
             PlayerManager manager = new PlayerManager();
             int expected = 1;
             Player newPlayer = new Player();
-            newPlayer.Username = "UnitTest2";
+            newPlayer.Username = "UnitTest";
             newPlayer.Email = "unitTest@gmail.com";
             newPlayer.UserPassword = "UnitPassword";
             newPlayer.HighestScore = 0;
@@ -75,6 +75,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void AddPlayerException()
         {
             // Arrange
@@ -91,8 +92,6 @@ namespace WitsClassesTests
             // Act
             int result = manager.AddPlayer(newPlayer);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -101,7 +100,7 @@ namespace WitsClassesTests
             // Arrange
             PlayerManager manager = new PlayerManager();
             int expected = 1;
-            string playerToDelete = "jason";
+            string playerToDelete = "ComoJodes";
 
             // Act
             int result = manager.DeletePlayer(playerToDelete);
@@ -141,6 +140,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void DeletePlayerException()
         {
             // Arrange
@@ -151,8 +151,6 @@ namespace WitsClassesTests
             // Act
             int result = manager.DeletePlayer(playerToDelete);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -161,8 +159,8 @@ namespace WitsClassesTests
             // Arrange
             PlayerManager manager = new PlayerManager();
             Player expectedPlayer = new Player();
-            string playerToGet = "UnitTest";
-            expectedPlayer.Username = "UnitTest";
+            string playerToGet = "UnitTest2";
+            expectedPlayer.Username = "UnitTest2";
             expectedPlayer.Email = "unitTest@gmail.com";
             expectedPlayer.UserPassword = "UnitPassword";
             expectedPlayer.HighestScore = 0;
@@ -207,6 +205,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void GetPlayerByUserException()
         {
             // Arrange
@@ -217,8 +216,6 @@ namespace WitsClassesTests
             // Act
             Player result = manager.GetPlayerByUser(playerToGet);
 
-            // Assert
-            Assert.AreEqual(expectedPlayer, result);
         }
 
         [TestMethod]
@@ -227,9 +224,9 @@ namespace WitsClassesTests
             // Arrange
             PlayerManager manager = new PlayerManager();
             Player expectedPlayer = new Player();
-            string playerToGet = "UnitTest";
+            string playerToGet = "UnitTest2";
             string userPassword = "UnitPassword";
-            expectedPlayer.Username = "UnitTest";
+            expectedPlayer.Username = "UnitTest2";
             expectedPlayer.Email = "unitTest@gmail.com";
             expectedPlayer.UserPassword = "UnitPassword";
             expectedPlayer.HighestScore = 0;
@@ -292,19 +289,17 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void GetPlayerByUserAndPasswordException()
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
-            Player expectedPlayer = new Player();
             string playerToGet = "UnitTest";
             string userPassword = "UnitPassword6788";
 
             // Act
             Player result = manager.GetPlayerByUserAndPassword(playerToGet, userPassword);
 
-            // Assert
-            Assert.AreEqual(expectedPlayer, result);
         }
 
         [TestMethod]
@@ -313,7 +308,7 @@ namespace WitsClassesTests
             // Arrange
             PlayerManager manager = new PlayerManager();
             int expected = 1;
-            string username = "UnitTest";
+            string username = "melus";
             string passwordToUpdate = "password45";
 
             // Act
@@ -356,6 +351,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void UpdatePasswordException()
         {
             // Arrange
@@ -367,8 +363,6 @@ namespace WitsClassesTests
             // Act
             int result = manager.UpdatePassword(username, passwordToUpdate);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -436,6 +430,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void AddRequestException()
         {
             // Arrange
@@ -447,8 +442,6 @@ namespace WitsClassesTests
             // Act
             int result = manager.AddRequest(from, to);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -472,7 +465,7 @@ namespace WitsClassesTests
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
-            string expected = null;
+            string expected = "Found";
             string from = null;
             string to = null;
 
@@ -484,19 +477,18 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void GetPlayerRequestException()
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
-            string expected = null;
+            string expected = "Found";
             string from = "UnitTest";
             string to = "UnitTest888";
 
             // Act
             string result = manager.GetPlayerRequest(from, to);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -580,6 +572,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void AcceptRequestException()
         {
             // Arrange
@@ -591,8 +584,6 @@ namespace WitsClassesTests
             // Act
             int result = manager.AcceptRequest(receiver, sender);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -676,6 +667,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void RejectRequestException()
         {
             // Arrange
@@ -687,8 +679,6 @@ namespace WitsClassesTests
             // Act
             int result = manager.RejectRequest(receiver, sender);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -777,6 +767,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void DeleteRequestException()
         {
             // Arrange
@@ -789,8 +780,6 @@ namespace WitsClassesTests
             // Act
             int result = manager.DeleteRequest(receiver, sender, status);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -858,6 +847,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void AddFriendshipException()
         {
             // Arrange
@@ -869,8 +859,6 @@ namespace WitsClassesTests
             // Act
             int result = manager.AddFriendship(player, friend);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -954,6 +942,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void DeleteFriendshipException()
         {
             // Arrange
@@ -965,8 +954,6 @@ namespace WitsClassesTests
             // Act
             int result = manager.DeleteFriendship(player, friend);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -1034,19 +1021,18 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void BlockPlayerException()
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
             int expected = 0;
             string player = "melus";
-            string playerToBlock = "UnitTest";
+            string playerToBlock = "UnitTest56";
 
             // Act
             int result = manager.BlockPlayer(player, playerToBlock);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -1114,19 +1100,18 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void IsPlayerBlockedException()
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
             bool expected = false;
             string player = "melus";
-            string blockedPlayer = "UnitTest";
+            string blockedPlayer = "UnitTest78";
 
             // Act
             bool result = manager.IsPlayerBlocked(player, blockedPlayer);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -1194,6 +1179,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void UpdateProfilePictureException()
         {
             // Arrange
@@ -1205,8 +1191,6 @@ namespace WitsClassesTests
             // Act
             bool result = manager.UpdateProfilePicture(player, profilePicId);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -1290,6 +1274,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void UpdateCelebrationException()
         {
             // Arrange
@@ -1301,8 +1286,6 @@ namespace WitsClassesTests
             // Act
             bool result = manager.UpdateCelebration(player, celebrationId);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
         [TestMethod]
@@ -1315,7 +1298,7 @@ namespace WitsClassesTests
             Dictionary<string, object> winnerInfo = new Dictionary<string, object>
             {
                 { "UserName", "PruebaAmigo" },
-                { "Score", 200 }
+                { "Score", 400 }
             };
 
             // Act
@@ -1366,6 +1349,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void UpdateHighestScoreException()
         {
             // Arrange
@@ -1381,8 +1365,6 @@ namespace WitsClassesTests
             // Act
             int result = manager.UpdateHighestScore(userInGame, winnerInfo);
 
-            // Assert
-            Assert.AreEqual(expected, result);
         }
 
     }

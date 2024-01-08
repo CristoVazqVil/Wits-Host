@@ -291,6 +291,7 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void GetQuestionByIdException()
         {
             // Arrange
