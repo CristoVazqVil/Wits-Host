@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using static WitsClasses.Contracts.Game;
 
 namespace WitsClasses.Contracts
 {
@@ -36,7 +37,7 @@ namespace WitsClasses.Contracts
         void GameEnded(int gameId, int playerNumber, bool isRegistered);
 
         [OperationContract(IsOneWay = true)]
-        void WhoWon(Dictionary<string, object> gameEndInfo);
+        void WhoWon(Dictionary<string, object> gameEndInfo); 
 
         [OperationContract(IsOneWay = true)]
         void ShowWinner(int gameId);
@@ -51,10 +52,11 @@ namespace WitsClasses.Contracts
     public interface IActiveGameCallback
     {
         [OperationContract]
-        void UpdateAnswers(Dictionary<int, string> playerAnswers);
+        void UpdateAnswers(Dictionary<PlayerGameKey, string> playerAnswers);
+
 
         [OperationContract]
-        void UpdateSelection(Dictionary<int, PlayerSelectedAnswer> playerSelectedAnswers);
+        void UpdateSelection(Dictionary<PlayerGameKey, PlayerSelectedAnswer> playerSelectedAnswers);
 
         [OperationContract]
         void ShowEnterWager();
@@ -80,5 +82,10 @@ namespace WitsClasses.Contracts
 
         [DataMember]
         public int IdProfilePicture { get; set; }
+
+        public override string ToString()
+        {
+            return $"SelectedAnswer: {SelectedAnswer}, IdProfilePicture: {IdProfilePicture}";
+        }
     }
 }

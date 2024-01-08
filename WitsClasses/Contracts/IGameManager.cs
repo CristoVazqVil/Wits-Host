@@ -48,6 +48,8 @@ namespace WitsClasses.Contracts
     [DataContract]
     public class Game
     {
+        
+
         [DataMember]
         public int GameId { get; set; }
 
@@ -73,7 +75,7 @@ namespace WitsClasses.Contracts
         public Dictionary<int, bool> PlayerEnded { get; set; } = new Dictionary<int, bool>();
 
         [DataMember]
-        public Dictionary<int, string> PlayerAnswers { get; set; }
+        public Dictionary<int, string> PlayerAnswers { get; set; } 
 
         [DataMember]
         public List<int> QuestionIds { get; set; }
@@ -87,7 +89,34 @@ namespace WitsClasses.Contracts
             PlayerScores = new Dictionary<string, int>();
             PlayerAnswers = new Dictionary<int, string>();
             QuestionIds = new List<int>();
+          
         }
+
+        public class PlayerGameKey
+        {
+            public int GameId { get; set; }
+            public int PlayerNumber { get; set; }
+
+            public override bool Equals(object obj)
+            {
+                if (obj == null || GetType() != obj.GetType())
+                    return false;
+
+                PlayerGameKey other = (PlayerGameKey)obj;
+                return (GameId == other.GameId) && (PlayerNumber == other.PlayerNumber);
+            }
+
+            public override int GetHashCode()
+            {
+                return (GameId, PlayerNumber).GetHashCode();
+            }
+
+            public override string ToString()
+            {
+                return $"GameId: {GameId}, PlayerNumber: {PlayerNumber}";
+            }
+        }
+
 
         public override bool Equals(object obj)
         {

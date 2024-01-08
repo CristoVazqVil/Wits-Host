@@ -16,6 +16,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Security.Cryptography;
 using System.Media;
 using System.CodeDom;
+using static WitsClasses.Contracts.Game;
 
 
 namespace WitsClasses
@@ -1168,9 +1169,11 @@ namespace WitsClasses
     public partial class PlayerManager : IChatManager, IActiveGame
     {
 
-        private Dictionary<int, string> playerAnswers = new Dictionary<int, string>();
-        private Dictionary<int, PlayerSelectedAnswer> playerSelectedAnswers = new Dictionary<int, PlayerSelectedAnswer>();
+        private Dictionary<PlayerGameKey, string> playerAnswers = new Dictionary<PlayerGameKey, string>();
+        private Dictionary<PlayerGameKey, PlayerSelectedAnswer> playerSelectedAnswers = new Dictionary<PlayerGameKey, PlayerSelectedAnswer>();
         private Dictionary<string, object> PlayersFinalScores = new Dictionary<string, object>();
+
+       
 
         public List<string> FilterPlayersByGame(Game game, int gameId)
         {
@@ -1289,6 +1292,12 @@ namespace WitsClasses
 
         public void StartGame(int gameId)
         {
+            playerAnswers = new Dictionary<PlayerGameKey, string>();
+            playerSelectedAnswers = new Dictionary<PlayerGameKey, PlayerSelectedAnswer>();
+            PlayersFinalScores = new Dictionary<string, object>();
+            CleanWinners(gameId);
+            ClearDictionaries();
+
             OperationContext currentContext = OperationContext.Current;
 
             if (currentContext == null)
@@ -1401,7 +1410,9 @@ namespace WitsClasses
 
         public void SavePlayerAnswer(int playerNumber, string answer, int gameId)
         {
-            playerAnswers[playerNumber] = answer;
+            playerAnswers = new Dictionary<PlayerGameKey, string>();
+            PlayerGameKey key = new PlayerGameKey { GameId = gameId, PlayerNumber = playerNumber };
+            playerAnswers[key] = answer;
 
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
             if (game != null)
@@ -1438,6 +1449,8 @@ namespace WitsClasses
             }
         }
 
+
+
         public void ReceivePlayerSelectedAnswer(Dictionary<string, object> answersInfo)
         {
             int playerNumber = (int)answersInfo["playerNumber"];
@@ -1445,8 +1458,9 @@ namespace WitsClasses
             int idProfilePicture = (int)answersInfo["profilePictureId"];
             int gameId = (int)answersInfo["gameId"];
 
+            PlayerGameKey key = new PlayerGameKey { GameId = gameId, PlayerNumber = playerNumber };
 
-            playerSelectedAnswers[playerNumber] = new PlayerSelectedAnswer { SelectedAnswer = selectedAnswer, IdProfilePicture = idProfilePicture };
+            playerSelectedAnswers[key] = new PlayerSelectedAnswer { SelectedAnswer = selectedAnswer, IdProfilePicture = idProfilePicture };
 
             Game game = games.FirstOrDefault(g => g.GameId == gameId);
             if (game != null)
@@ -1458,6 +1472,11 @@ namespace WitsClasses
                     try
                     {
                         usersInGameContexts[userInGame].UpdateSelection(playerSelectedAnswers);
+
+                        foreach (var entry in playerSelectedAnswers)
+                        {
+                            Console.WriteLine($"Key: {entry.Key.ToString()}, Value: {entry.Value.ToString()}");
+                        }
                     }
                     catch (TimeoutException ex)
                     {
@@ -1478,6 +1497,7 @@ namespace WitsClasses
                 }
             }
         }
+
 
         public void ReadyToWager(int gameId, int playerNumber, bool isReady)
         {
@@ -1611,6 +1631,7 @@ namespace WitsClasses
                 return;
             }
 
+
             int gameId = (int)gameEndInfo["gameId"];
             int numberPlayer = (int)gameEndInfo["player"];
             string userName = gameEndInfo.ContainsKey("userName") ? (string)gameEndInfo["userName"] : "";
@@ -1636,6 +1657,8 @@ namespace WitsClasses
 
                     try
                     {
+                     
+
                         PlayersFinalScores.Add($"Player{numberPlayer}", playerInfo);
                     }
                     catch (ArgumentException ex)
