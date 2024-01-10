@@ -86,10 +86,10 @@ namespace WitsClassesTests.WitsService {
     public interface IActiveGameCallback {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IActiveGame/UpdateAnswers", ReplyAction="http://tempuri.org/IActiveGame/UpdateAnswersResponse")]
-        void UpdateAnswers(System.Collections.Generic.Dictionary<int, string> playerAnswers);
+        void UpdateAnswers(System.Collections.Generic.Dictionary<WitsClasses.Contracts.Game.PlayerGameKey, string> playerAnswers);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IActiveGame/UpdateSelection", ReplyAction="http://tempuri.org/IActiveGame/UpdateSelectionResponse")]
-        void UpdateSelection(System.Collections.Generic.Dictionary<int, WitsClasses.Contracts.PlayerSelectedAnswer> playerSelectedAnswers);
+        void UpdateSelection(System.Collections.Generic.Dictionary<WitsClasses.Contracts.Game.PlayerGameKey, WitsClasses.Contracts.PlayerSelectedAnswer> playerSelectedAnswers);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IActiveGame/ShowEnterWager", ReplyAction="http://tempuri.org/IActiveGame/ShowEnterWagerResponse")]
         void ShowEnterWager();

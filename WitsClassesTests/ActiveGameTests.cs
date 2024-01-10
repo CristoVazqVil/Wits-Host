@@ -202,5 +202,15 @@ namespace WitsClassesTests
         {
             IsCalled = true;
         }
+
+        public void UpdateAnswers(Dictionary<WitsClasses.Contracts.Game.PlayerGameKey, string> playerAnswers)
+        {
+            IsCalled = true;
+        }
+
+        public void UpdateSelection(Dictionary<WitsClasses.Contracts.Game.PlayerGameKey, WitsClasses.Contracts.PlayerSelectedAnswer> playerSelectedAnswers)
+        {
+            IsCalled = true;
+        }
     }
 }
