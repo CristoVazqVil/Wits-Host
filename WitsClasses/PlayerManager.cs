@@ -17,7 +17,8 @@ using System.Security.Cryptography;
 using System.Media;
 using System.CodeDom;
 using static WitsClasses.Contracts.Game;
-
+using System.Data.Entity.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace WitsClasses
 {
@@ -56,7 +57,7 @@ namespace WitsClasses
             {
                 witslogger.Error(ex);
             }
-            catch (InvalidOperationException ex)
+            catch(ArgumentNullException ex)
             {
                 witslogger.Error(ex);
             }
@@ -78,7 +79,7 @@ namespace WitsClasses
             {
                 witslogger.Error(ex);
             }
-            catch (InvalidOperationException ex)
+            catch (ArgumentNullException ex)
             {
                 witslogger.Error(ex);
             }
@@ -100,7 +101,7 @@ namespace WitsClasses
             {
                 witslogger.Error(ex);
             }
-            catch (InvalidOperationException ex)
+            catch (ArgumentNullException ex)
             {
                 witslogger.Error(ex);
             }
@@ -122,7 +123,7 @@ namespace WitsClasses
             {
                 witslogger.Error(ex);
             }
-            catch (InvalidOperationException ex)
+            catch (ArgumentNullException ex)
             {
                 witslogger.Error(ex);
             }
@@ -157,7 +158,17 @@ namespace WitsClasses
                     context.Players.Add(newUser);
                     affectedTables = context.SaveChanges();
                 }
-                catch (DataException ex)
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = -1;
+                }
+                catch (DbUpdateException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = 0;
+                }
+                catch (DbEntityValidationException ex)
                 {
                     witslogger.Error(ex);
                     affectedTables = 0;
@@ -165,7 +176,7 @@ namespace WitsClasses
                 catch (SqlException ex)
                 {
                     witslogger.Error(ex);
-                    affectedTables = 0;
+                    affectedTables = -1;
                 }
             }
 
@@ -192,15 +203,15 @@ namespace WitsClasses
                         affectedRows = 0;
                     }
                 }
-                catch (DataException ex)
+                catch (EntityException ex)
                 {
                     witslogger.Error(ex);
-                    affectedRows = 0;
+                    affectedRows = -1;
                 }
                 catch (SqlException ex)
                 {
                     witslogger.Error(ex);
-                    affectedRows = 0;
+                    affectedRows = -1;
                 }
             }
 
@@ -234,7 +245,12 @@ namespace WitsClasses
                         affectedTables = 0;
                     }
                 }
-                catch (DataException ex)
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    affectedTables = -1;
+                }
+                catch (DbUpdateException ex)
                 {
                     witslogger.Error(ex);
                     affectedTables = 0;
@@ -251,11 +267,17 @@ namespace WitsClasses
 
         public void AddConnectedUser(string username)
         {
-            
-            if (!allConnectedUsers.Contains(username))
+            try
             {
-                allConnectedUsers.Add(username);
-                UpdateFriendsForAll();
+                if (!allConnectedUsers.Contains(username))
+                {
+                    allConnectedUsers.Add(username);
+                    UpdateFriendsForAll();
+                }
+            }
+            catch (ArgumentNullException ex)
+            {
+                witslogger.Error(ex);
             }
 
             AddConnectedUserInMenu(username);
@@ -281,7 +303,7 @@ namespace WitsClasses
             {
                 witslogger.Error(ex);
             }
-            catch (InvalidOperationException ex)
+            catch (ArgumentNullException ex)
             {
                 witslogger.Error(ex);
             }
@@ -303,11 +325,11 @@ namespace WitsClasses
                     }
                 }
             }
-            catch (InvalidOperationException ex)
+            catch (KeyNotFoundException ex)
             {
                 witslogger.Error(ex);
             }
-            catch (KeyNotFoundException ex)
+            catch (ArgumentNullException ex)
             {
                 witslogger.Error(ex);
             }
@@ -558,9 +580,9 @@ namespace WitsClasses
                 catch (EntityException ex)
                 {
                     witslogger.Error(ex);
-                    affectedTables = 0;
+                    affectedTables = -1;
                 }
-                catch (DataException ex)
+                catch (DbUpdateException ex)
                 {
                     witslogger.Error(ex);
                     affectedTables = 0;
@@ -568,7 +590,7 @@ namespace WitsClasses
                 catch (SqlException ex)
                 {
                     witslogger.Error(ex);
-                    affectedTables = 0;
+                    affectedTables = -1;
                 }
 
             }
@@ -599,9 +621,9 @@ namespace WitsClasses
                 catch (EntityException ex)
                 {
                     witslogger.Error(ex);
-                    affectedTables = 0;
+                    affectedTables = -1;
                 }
-                catch (DataException ex)
+                catch (DbUpdateException ex)
                 {
                     witslogger.Error(ex);
                     affectedTables = 0;
@@ -609,7 +631,7 @@ namespace WitsClasses
                 catch (SqlException ex)
                 {
                     witslogger.Error(ex);
-                    affectedTables = 0;
+                    affectedTables = -1;
                 }
             }
 
@@ -640,9 +662,9 @@ namespace WitsClasses
                 catch (EntityException ex)
                 {
                     witslogger.Error(ex);
-                    affectedTables = 0;
+                    affectedTables = -1;
                 }
-                catch (DataException ex)
+                catch (DbUpdateException ex)
                 {
                     witslogger.Error(ex);
                     affectedTables = 0;
@@ -650,7 +672,7 @@ namespace WitsClasses
                 catch (SqlException ex)
                 {
                     witslogger.Error(ex);
-                    affectedTables = 0;
+                    affectedTables = -1;
                 }
             }
 
@@ -681,9 +703,9 @@ namespace WitsClasses
                 catch (EntityException ex)
                 {
                     witslogger.Error(ex);
-                    affectedTables = 0;
+                    affectedTables = -1;
                 }
-                catch (DataException ex)
+                catch (DbUpdateException ex)
                 {
                     witslogger.Error(ex);
                     affectedTables = 0;
@@ -691,7 +713,7 @@ namespace WitsClasses
                 catch (SqlException ex)
                 {
                     witslogger.Error(ex);
-                    affectedTables = 0;
+                    affectedTables = -1;
                 }
             }
 
@@ -724,9 +746,9 @@ namespace WitsClasses
                     catch (EntityException ex)
                     {
                         witslogger.Error(ex);
-                        affectedTables = 0;
+                        affectedTables = -1;
                     }
-                    catch (DataException ex)
+                    catch (DbUpdateException ex)
                     {
                         witslogger.Error(ex);
                         affectedTables = 0;
@@ -734,7 +756,7 @@ namespace WitsClasses
                     catch (SqlException ex)
                     {
                         witslogger.Error(ex);
-                        affectedTables = 0;
+                        affectedTables = -1;
                     }
                 }
             }
@@ -772,9 +794,9 @@ namespace WitsClasses
                     catch (EntityException ex)
                     {
                         witslogger.Error(ex);
-                        affectedTables = 0;
+                        affectedTables = -1;
                     }
-                    catch (DataException ex)
+                    catch (DbUpdateException ex)
                     {
                         witslogger.Error(ex);
                         affectedTables = 0;
@@ -782,7 +804,7 @@ namespace WitsClasses
                     catch (SqlException ex)
                     {
                         witslogger.Error(ex);
-                        affectedTables = 0;
+                        affectedTables = -1;
                     }
                 }
             }
@@ -802,10 +824,6 @@ namespace WitsClasses
                         .Any(bp => bp.player == player && bp.blockedPlayer == blockedPlayer);
                 }
                 catch (EntityException ex)
-                {
-                    witslogger.Error(ex);
-                }
-                catch (DataException ex)
                 {
                     witslogger.Error(ex);
                 }
@@ -850,9 +868,9 @@ namespace WitsClasses
                     catch (EntityException ex)
                     {
                         witslogger.Error(ex);
-                        affectedTables = 0;
+                        affectedTables = -1;
                     }
-                    catch (DataException ex)
+                    catch (DbUpdateException ex)
                     {
                         witslogger.Error(ex);
                         affectedTables = 0;
@@ -860,7 +878,7 @@ namespace WitsClasses
                     catch (SqlException ex)
                     {
                         witslogger.Error(ex);
-                        affectedTables = 0;
+                        affectedTables = -1;
                     }
                 }
             }
@@ -891,7 +909,7 @@ namespace WitsClasses
                     witslogger.Error(ex);
                     validator = false;
                 }
-                catch (DataException ex)
+                catch (DbUpdateException ex)
                 {
                     witslogger.Error(ex);
                     validator = false;
@@ -929,7 +947,7 @@ namespace WitsClasses
                     witslogger.Error(ex);
                     validator = false;
                 }
-                catch (DataException ex)
+                catch (DbUpdateException ex)
                 {
                     witslogger.Error(ex);
                     validator = false;
@@ -1189,11 +1207,19 @@ namespace WitsClasses
 
         public void RegisterUserContext(string username)
         {
-            if (!usersInLobbyContexts.ContainsKey(username))
+            try
             {
-                IChatManagerCallback currentUserCallbackChannel = OperationContext.Current.GetCallbackChannel<IChatManagerCallback>();
-                usersInLobbyContexts.Add(username, currentUserCallbackChannel);
+                if (!usersInLobbyContexts.ContainsKey(username))
+                {
+                    IChatManagerCallback currentUserCallbackChannel = OperationContext.Current.GetCallbackChannel<IChatManagerCallback>();
+                    usersInLobbyContexts.Add(username, currentUserCallbackChannel);
+                }
             }
+            catch (ArgumentNullException ex)
+            {
+                witslogger.Error(ex);
+            }
+            
         }
 
         public void UnregisterUserContext(string username)
@@ -1207,7 +1233,7 @@ namespace WitsClasses
                         usersInLobbyContexts.Remove(username);
                     }
                 }
-                catch (InvalidOperationException ex)
+                catch (ArgumentNullException ex)
                 {
                     witslogger.Error(ex);
                 }
@@ -1342,11 +1368,19 @@ namespace WitsClasses
 
         public void RegisterUserInGameContext(string username)
         {
-            if (!usersInGameContexts.ContainsKey(username))
+            try
             {
-                IActiveGameCallback currentUserCallbackChannel = OperationContext.Current.GetCallbackChannel<IActiveGameCallback>();
-                usersInGameContexts.Add(username, currentUserCallbackChannel);
+                if (!usersInGameContexts.ContainsKey(username))
+                {
+                    IActiveGameCallback currentUserCallbackChannel = OperationContext.Current.GetCallbackChannel<IActiveGameCallback>();
+                    usersInGameContexts.Add(username, currentUserCallbackChannel);
+                }
             }
+            catch (ArgumentNullException ex)
+            {
+                witslogger.Error(ex);
+            }
+            
         }
 
         public void UnregisterUserInGameContext(string username)
@@ -1360,7 +1394,7 @@ namespace WitsClasses
                         usersInGameContexts.Remove(username);
                     }
                 }
-                catch (InvalidOperationException ex)
+                catch (ArgumentNullException ex)
                 {
                     witslogger.Error(ex);
                 }
@@ -1813,7 +1847,12 @@ namespace WitsClasses
                         }
                     }
                 }
-                catch (DataException ex)
+                catch (EntityException ex)
+                {
+                    witslogger.Error(ex);
+                    returnValue = 0;
+                }
+                catch (DbUpdateException ex)
                 {
                     witslogger.Error(ex);
                     returnValue = 0;
@@ -1828,9 +1867,6 @@ namespace WitsClasses
 
             return returnValue;
         }
-
-
-
 
         public void GameEnded(int gameId, int playerNumber, bool isRegistered)
         {

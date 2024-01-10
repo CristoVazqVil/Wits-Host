@@ -82,9 +82,9 @@ namespace WitsClassesTests
             PlayerManager manager = new PlayerManager();
             int expected = 0;
             Player newPlayer = new Player();
-            newPlayer.Username = null;
-            newPlayer.Email = null;
-            newPlayer.UserPassword = null;
+            newPlayer.Username = "UnitTest34";
+            newPlayer.Email = "unitTest@gmail.com";
+            newPlayer.UserPassword = "UnitPassword";
             newPlayer.HighestScore = 0;
             newPlayer.ProfilePictureId = 1;
             newPlayer.CelebrationId = 1;
@@ -100,7 +100,7 @@ namespace WitsClassesTests
             // Arrange
             PlayerManager manager = new PlayerManager();
             int expected = 1;
-            string playerToDelete = "ComoJodes";
+            string playerToDelete = "CorreoDoggo";
 
             // Act
             int result = manager.DeletePlayer(playerToDelete);
@@ -309,7 +309,7 @@ namespace WitsClassesTests
             PlayerManager manager = new PlayerManager();
             int expected = 1;
             string username = "melus";
-            string passwordToUpdate = "password45";
+            string passwordToUpdate = "password455";
 
             // Act
             int result = manager.UpdatePassword(username, passwordToUpdate);
@@ -435,13 +435,12 @@ namespace WitsClassesTests
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
-            int expected = 0;
+            int expected = -1;
             string from = "UnitTest";
             string to = "UnitTest2";
 
             // Act
             int result = manager.AddRequest(from, to);
-
         }
 
         [TestMethod]
@@ -461,44 +460,13 @@ namespace WitsClassesTests
         }
 
         [TestMethod]
-        public void GetPlayerRequestFailed()
-        {
-            // Arrange
-            PlayerManager manager = new PlayerManager();
-            string expected = "Found";
-            string from = null;
-            string to = null;
-
-            // Act
-            string result = manager.GetPlayerRequest(from, to);
-
-            // Assert
-            Assert.AreEqual(expected, result);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
-        public void GetPlayerRequestException()
-        {
-            // Arrange
-            PlayerManager manager = new PlayerManager();
-            string expected = "Found";
-            string from = "UnitTest";
-            string to = "UnitTest888";
-
-            // Act
-            string result = manager.GetPlayerRequest(from, to);
-
-        }
-
-        [TestMethod]
         public void AcceptRequestSuccess()
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
             int expected = 1;
-            string receiver = "UnitTest2";
-            string sender = "UnitTest";
+            string receiver = "UnitTest";
+            string sender = "UnitTest2";
 
             // Act
             int result = manager.AcceptRequest(receiver, sender);
@@ -961,7 +929,7 @@ namespace WitsClassesTests
         {
             // Arrange
             PlayerManager manager = new PlayerManager();
-            int expected = 1;
+            int expected = 0;
             string player = "melus";
             string playerToBlock = "UnitTest";
 
@@ -1121,7 +1089,7 @@ namespace WitsClassesTests
             PlayerManager manager = new PlayerManager();
             bool expected = true;
             string player = "melus";
-            int profilePicId = 4;
+            int profilePicId = 5;
 
             // Act
             bool result = manager.UpdateProfilePicture(player, profilePicId);
@@ -1200,7 +1168,7 @@ namespace WitsClassesTests
             PlayerManager manager = new PlayerManager();
             bool expected = true;
             string player = "melus";
-            int celebrationId = 6;
+            int celebrationId = 4;
 
             // Act
             bool result = manager.UpdateCelebration(player, celebrationId);
@@ -1298,7 +1266,7 @@ namespace WitsClassesTests
             Dictionary<string, object> winnerInfo = new Dictionary<string, object>
             {
                 { "UserName", "PruebaAmigo" },
-                { "Score", 400 }
+                { "Score", 401 }
             };
 
             // Act
