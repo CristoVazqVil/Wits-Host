@@ -78,6 +78,7 @@ namespace WitsClassesTests
         [ExpectedException(typeof(System.Data.Entity.Core.EntityException))]
         public void AddPlayerException()
         {
+            
             // Arrange
             PlayerManager manager = new PlayerManager();
             int expected = 0;
@@ -100,7 +101,7 @@ namespace WitsClassesTests
             // Arrange
             PlayerManager manager = new PlayerManager();
             int expected = 1;
-            string playerToDelete = "ComoJodes";
+            string playerToDelete = "PruebaAmigo3";
 
             // Act
             int result = manager.DeletePlayer(playerToDelete);
